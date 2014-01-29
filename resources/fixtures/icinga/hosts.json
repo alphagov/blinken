@@ -1,0 +1,35 @@
+
+{ "cgi_json_version": "1.10.0",
+"icinga_status": {
+"status_data_age": 8,
+"status_update_interval": 10,
+"reading_status_data_ok": true,
+"program_version": "1.10.2",
+"icinga_pid": 20509,
+"timezone": "UTC",
+"date_format": "iso8601",
+"program_start": 1391002090,
+"total_running_time": "0d 0h 44m 13s",
+"last_external_command_check": 1391004730,
+"last_log_file_rotation": 0,
+"notifications_enabled": true,
+"disable_notifications_expire_time": 0,
+"service_checks_being_executed": true,
+"passive_service_checks_being_accepted": true,
+"host_checks_being_executed": true,
+"passive_host_checks_being_accepted": true,
+"obsessing_over_services": false,
+"obsessing_over_hosts": false,
+"check_service_freshness": true,
+"check_host_freshness": false,
+"event_handlers_enabled": true,
+"flap_detection_enabled": true,
+"performance_data_being_processed": false
+}, 
+"status": {
+"host_status": [
+{ "host_name": "monitoring.management", "host_display_name": "monitoring.management", "status": "UP", "last_check": "2014-01-29 14:08:50", "duration": "0d  1h 56m 57s", "attempts": "1/10", "state_type": "HARD", "is_flapping": false, "in_scheduled_downtime": false, "active_checks_enabled": true, "passive_checks_enabled": true, "notifications_enabled": true, "has_been_acknowledged": false, "action_url": null, "notes_url": null, "status_information": "PING OK - Packet loss = 0%, RTA = 0.05 ms"},
+{ "host_name": "puppetmaster-1.management", "host_display_name": "puppetmaster-1.management", "status": "UP", "last_check": "2014-01-29 14:10:20", "duration": "0d  1h 13m 44s", "attempts": "1/10", "state_type": "HARD", "is_flapping": false, "in_scheduled_downtime": false, "active_checks_enabled": true, "passive_checks_enabled": true, "notifications_enabled": true, "has_been_acknowledged": false, "action_url": null, "notes_url": null, "status_information": "PING OK - Packet loss = 0%, RTA = 0.05 ms"}
+]
+}
+}
