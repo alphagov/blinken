@@ -3,7 +3,8 @@
             [docopt.match :as dm]
             [clojure.java.io :as io]
             [govuk.blinken.icinga :as icinga]
-            [clj-yaml.core :as yaml]))
+            [clj-yaml.core :as yaml]
+            [govuk.blinken.protocols :as protocols]))
 
 
 (def type-to-worker-fn {"icinga" icinga/create})

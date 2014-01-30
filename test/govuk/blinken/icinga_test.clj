@@ -2,7 +2,8 @@
   (:require [clojure.test :refer :all]
             [clojure.java.io :as io]
             [cheshire.core :as json]
-            [govuk.blinken.icinga :as icinga]))
+            [govuk.blinken.icinga :as icinga]
+            [govuk.blinken.protocols :as protocols]))
 
 (def example-json (json/parse-string (slurp (io/resource "fixtures/icinga/hosts.json")) true))
 
@@ -11,4 +12,10 @@
     (is (= (icinga/parse-hosts example-json)
            {:up ["monitoring.management" "puppetmaster-1.management"]
             :down []}))))
+
+(deftest test-create
+  (testing "it creates a service"
+    (let [service (icinga/create "http://foo" {})]
+      (is (= (protocols/get-status service)
+             {:hosts {:up [] :down []}})))))
 

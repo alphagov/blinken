@@ -1,6 +1,7 @@
 (ns govuk.blinken.icinga
   (:require [org.httpkit.client :as http]
-            [cheshire.core :as json]))
+            [cheshire.core :as json]
+            [govuk.blinken.protocols :as protocols]))
 
 
 (defn- parse-host [hosts host]
@@ -29,7 +30,15 @@
 (defn get-hosts [base-url status-atom]
   (http/get (str base-url "/cgi-bin/icinga/status.cgi?style=hostdetail&jsonoutput")
             {:insecure? true}
-            (apply handle-hosts-response status-atom)))
+            (partial handle-hosts-response status-atom)))
+
+
+(deftype IcingaService [status-atom]
+  protocols/Service
+  (get-status [this] @status-atom))
+
 
 (defn create [url options]
-  "unimplemented")
+  (let [status-atom (atom {:hosts {:up [] :down []}})]
+    (IcingaService. status-atom)))
+
