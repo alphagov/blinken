@@ -31,3 +31,5 @@
             {:insecure? true}
             (apply handle-hosts-response status-atom)))
 
+(defn create [url options]
+  "unimplemented")

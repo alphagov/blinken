@@ -1,0 +1,13 @@
+
+# Test config for Blinken
+
+services:
+  "GOV.UK Production":
+    type: icinga
+    url:  https://icinga.foo.production
+    options:
+      foo: bar
+  "GOV.UK Staging":
+    type: icinga
+    url:  https://icinga.foo.staging
+
