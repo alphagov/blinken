@@ -8,5 +8,6 @@
                  [http-kit "2.1.16"]
                  [cheshire "5.2.0"]
                  [hiccup "1.0.4"]
-                 [clj-yaml "0.4.0"]]
+                 [clj-yaml "0.4.0"]
+                 [compojure "1.1.6"]]
   :main govuk.blinken)

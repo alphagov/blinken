@@ -4,7 +4,9 @@
             [clojure.java.io :as io]
             [govuk.blinken.icinga :as icinga]
             [clj-yaml.core :as yaml]
-            [govuk.blinken.protocols :as protocols]))
+            [org.httpkit.server :as httpkit]
+            [govuk.blinken.protocols :as protocols]
+            [govuk.blinken.routes :as routes]))
 
 
 (def type-to-worker-fn {"icinga" icinga/create})
@@ -33,9 +35,12 @@
 A dashboard that aggregates multiple alert sources
 
 Usage:
-  blinken <config-path>
+  blinken [options] <config-path>
   blinken -h | --help
   blinken -v | --version
+
+Options:
+  --port=<port>  Port for web server. [default:8080]
 ")
 
 (def version "Blinken 0.0.1-SNAPSHOT")
@@ -53,7 +58,10 @@ Usage:
      (println version)
 
      :else
-     (let [config-path (arg-map "<config-path>")]
+     (let [config-path (arg-map "<config-path>")
+           port (Integer/parseInt (arg-map "--port"))]
        (if-let [config (load-config config-path)]
-         (println config)
+         (do (httpkit/run-server (routes/build (:services config))
+                                 {:port port})
+             (println "Running..."))
          (println "Config file does not exist:" config-path))))))
