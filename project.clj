@@ -6,5 +6,6 @@
   :dependencies [[org.clojure/clojure "1.5.1"]
                  [docopt "0.6.1"]
                  [http-kit "2.1.16"]
-                 [cheshire "5.2.0"]]
+                 [cheshire "5.2.0"]
+                 [hiccup "1.0.4"]]
   :main govuk.blinken)
