@@ -27,6 +27,11 @@
                                           (children element))) html)]
     (some #(= % :found) results)))
 
+(defn num-elements-with-class [html class]
+  (let [flat-html (flatten html)]
+    (count (filter #(= (:class %) class) flat-html))))
+
+
 (deftest test-host-status
   (testing "host status widget with just up"
     (let [html (dashboard/host-status {:up ["foo" "bar"] :down []})]
@@ -45,5 +50,15 @@
       (is (element-has-content? html "down" 1))
       (is (has-class? html "down-hosts"))
       (is (has-content? html "foo")))))
+
+
+(deftest test-generate-structure
+  (testing "has correct number of services"
+    (let [html (dashboard/generate-structure [{:name "GOV.UK Production" :hosts {:up [] :down []}}
+                                              {:name "GOV.UK Staging" :hosts {:up [] :down []}}])]
+      (is (= (num-elements-with-class html "service") 2))
+      (is (= (num-elements-with-class html "host-status") 2))
+      (is (has-content? html "GOV.UK Production"))
+      (is (has-content? html "GOV.UK Staging")))))
 
 

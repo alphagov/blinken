@@ -1,5 +1,6 @@
 (ns govuk.blinken.dashboard
-  (:require [hiccup.core :as hiccup]))
+  (:require [hiccup.core :as hiccup]
+            [hiccup.page :as page]))
 
 
 (defn host-status [status]
@@ -12,4 +13,13 @@
         (for [down-host (:down status)]
           [:li down-host])])]))
 
+(defn generate-structure [services]
+  [:head [:title "Blinken"]]
+  [:body (for [service services]
+           [:div {:class "service"}
+            [:h1 (:name service)]
+            (host-status (:hosts service))])])
+
+(defn generate [services]
+  (page/html5 (generate-structure services)))
 
