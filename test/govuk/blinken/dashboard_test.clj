@@ -25,7 +25,7 @@
                                                  (= (nth element 2) content))
                                           :found
                                           (children element))) html)]
-    (some #(= % :found) results)))
+    (some #(= % :found) (flatten results))))
 
 (defn num-elements-with-class [html class]
   (let [flat-html (flatten html)]
