@@ -1,0 +1,34 @@
+{ "cgi_json_version": "1.10.0",
+"icinga_status": {
+"status_data_age": 1,
+"status_update_interval": 10,
+"reading_status_data_ok": true,
+"program_version": "1.10.1",
+"icinga_pid": 26530,
+"timezone": "UTC",
+"date_format": "iso8601",
+"program_start": 1391182477,
+"total_running_time": "0d 0h 30m 41s",
+"last_external_command_check": 1391184307,
+"last_log_file_rotation": 0,
+"notifications_enabled": true,
+"disable_notifications_expire_time": 0,
+"service_checks_being_executed": true,
+"passive_service_checks_being_accepted": true,
+"host_checks_being_executed": true,
+"passive_host_checks_being_accepted": true,
+"obsessing_over_services": false,
+"obsessing_over_hosts": false,
+"check_service_freshness": true,
+"check_host_freshness": false,
+"event_handlers_enabled": true,
+"flap_detection_enabled": true,
+"performance_data_being_processed": false
+}, 
+"status": {
+"service_status": [
+{ "host_name": "apt-1.management.production", "host_display_name": "apt-1.management.production", "service_description": "high disk time", "service_display_name": "high disk time", "status": "OK", "last_check": "2014-01-31 16:00:28", "duration": "17d  0h 25m 57s", "attempts": "1/1", "state_type": "HARD", "is_flapping": false, "in_scheduled_downtime": false, "active_checks_enabled": true, "passive_checks_enabled": true, "notifications_enabled": true, "has_been_acknowledged": false, "action_url": "https://graphite.production.alphagov.co.uk/render/?width=600&height=300&target=movingMedian(sum(apt-1_management_production.disk-sd?.disk_time.*),30)&target=alias(dashed(constantLine(100)),%22warning%22)&target=alias(dashed(constantLine(200)),%22critical%22)", "notes_url": null, "status_information": "OK: value=0.0"},
+{ "host_name": "whitehall-mysql-slave-2.backend.production", "host_display_name": "whitehall-mysql-slave-2.backend.production", "service_description": "unable to ssh", "service_display_name": "unable to ssh", "status": "CRITICAL", "last_check": "2014-01-31 16:02:43", "duration": "59d  4h 10m 18s", "attempts": "1/4", "state_type": "HARD", "is_flapping": false, "in_scheduled_downtime": false, "active_checks_enabled": true, "passive_checks_enabled": true, "notifications_enabled": true, "has_been_acknowledged": false, "action_url": null, "notes_url": null, "status_information": "SSH OK - OpenSSH_5.9p1 Debian-5ubuntu1.1 (protocol 2.0)"}
+]
+}
+}

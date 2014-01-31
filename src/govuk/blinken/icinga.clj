@@ -4,6 +4,18 @@
             [clojure.core.async :as async]
             [govuk.blinken.protocols :as protocols]))
 
+(defn- handle-response [status-atom status-keyword parse-fn response]
+  (cond (:error response)
+        (println "Request error:" response)
+
+        (= (:status response) 200)
+        (swap! status-atom assoc status-keyword
+               (parse-fn (json/parse-string (:body response) true)))
+
+        :else
+        (println "Unknown request error:" response)))
+
+
 
 (defn- parse-host [hosts host]
   (let [status (:status host)
@@ -16,22 +28,36 @@
           {:up [] :down []}
           (-> hosts-json :status :host_status)))
 
-
-(defn- handle-hosts-response [status-atom response]
-  (cond (:error response)
-        (println "Request error:" response)
-
-        (= (:status response) 200)
-        (swap! status-atom assoc :hosts
-               (parse-hosts (json/parse-string (:body response) true)))
-
-        :else
-        (println "Unknown request error:" response)))
-
 (defn get-hosts [base-url status-atom]
   (http/get (str base-url "/cgi-bin/icinga/status.cgi?style=hostdetail&jsonoutput")
             {:insecure? true}
-            (partial handle-hosts-response status-atom)))
+            (partial handle-response status-atom :hosts parse-hosts)))
+
+
+
+(defn- parse-alert [alerts alert]
+  (let [status (:status alert)
+        status-keyword (cond (= status "OK") :ok
+                             (= status "CRITICAL") :critical
+                             (= status "WARNING") :warning
+                             :else :unknown)
+        current-list (alerts status-keyword)]
+    (assoc alerts status-keyword (conj current-list
+                                       {:host (:host_name alert)
+                                        :name (:service_description alert)
+                                        :info (:status_information alert)}))))
+
+(defn parse-alerts [alerts-json]
+  (reduce parse-alert
+          {:critical [] :warning [] :ok [] :unknown []}
+          (-> alerts-json :status :service_status)))
+
+(defn get-alerts [base-url status-atom]
+  (http/get (str base-url "/cgi-bin/icinga/status.cgi?jsonoutput")
+            {:insecure? true}
+            (partial handle-response status-atom :alerts parse-alerts)))
+
+
 
 (defn poll [ms func & args]
   (let [control (async/chan)
@@ -48,6 +74,8 @@
   (async/>!! (:control chans) :cancel)
   (async/<!! (:out chans)))
 
+
+
 (deftype IcingaService [url options status-atom poller-atom]
   protocols/Service
   (start [this] (let [poll-ms (get options :poll-ms 1000)]
@@ -55,7 +83,8 @@
                   (reset! poller-atom
                           (poll poll-ms
                                 (fn [status-atom]
-                                  (get-hosts url status-atom))
+                                  (get-hosts url status-atom)
+                                  (get-alerts url status-atom))
                                 status-atom))))
   (get-status [this] @status-atom)
   (stop [this] (if-let [poller @poller-atom]
@@ -65,6 +94,7 @@
 
 
 (defn create [url options]
-  (let [status-atom (atom {:hosts {:up [] :down []}})]
+  (let [status-atom (atom {:hosts  {:up [] :down []}
+                           :alerts {:critical [] :warning [] :ok [] :unknown []}})]
     (IcingaService. url options status-atom (atom nil))))
 
