@@ -61,7 +61,8 @@ Options:
      (let [config-path (arg-map "<config-path>")
            port (Integer/parseInt (arg-map "--port"))]
        (if-let [config (load-config config-path)]
-         (do (httpkit/run-server (routes/build (:services config))
+         (do (doall (map #(protocols/start (:worker %)) (:services config)))
+             (httpkit/run-server (routes/build (:services config))
                                  {:port port})
-             (println "Running..."))
+             (println "Started web server on" port))
          (println "Config file does not exist:" config-path))))))

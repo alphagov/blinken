@@ -1,6 +1,7 @@
 (ns govuk.blinken.icinga
   (:require [org.httpkit.client :as http]
             [cheshire.core :as json]
+            [clojure.core.async :as async]
             [govuk.blinken.protocols :as protocols]))
 
 
@@ -32,13 +33,38 @@
             {:insecure? true}
             (partial handle-hosts-response status-atom)))
 
+(defn poll [ms func & args]
+  (let [control (async/chan)
+        times (atom 0)
+        out (async/go (loop [[v ch] (async/alts! [(async/timeout 0) control])]
+                        (if (= ch control)
+                          @times
+                          (do (swap! times inc)
+                              (apply func args)
+                              (recur (async/alts! [(async/timeout ms) control]))))))]
+    {:control control :out out}))
 
-(deftype IcingaService [status-atom]
+(defn cancel-poll [chans]
+  (async/>!! (:control chans) :cancel)
+  (async/<!! (:out chans)))
+
+(deftype IcingaService [url options status-atom poller-atom]
   protocols/Service
-  (get-status [this] @status-atom))
+  (start [this] (let [poll-ms (get options :poll-ms 1000)]
+                  (println (str "Starting Icinga poller [ms:" poll-ms ", url:" url "]"))
+                  (reset! poller-atom
+                          (poll poll-ms
+                                (fn [status-atom]
+                                  (get-hosts url status-atom))
+                                status-atom))))
+  (get-status [this] @status-atom)
+  (stop [this] (if-let [poller @poller-atom]
+                 (do (cancel-poll poller)
+                     (reset! poller-atom nil)
+                     (println "Killed Icinga poller")))))
 
 
 (defn create [url options]
   (let [status-atom (atom {:hosts {:up [] :down []}})]
-    (IcingaService. status-atom)))
+    (IcingaService. url options status-atom (atom nil))))
 

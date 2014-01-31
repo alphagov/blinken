@@ -9,5 +9,6 @@
                  [cheshire "5.2.0"]
                  [hiccup "1.0.4"]
                  [clj-yaml "0.4.0"]
-                 [compojure "1.1.6"]]
+                 [compojure "1.1.6"]
+                 [org.clojure/core.async "0.1.267.0-0d7780-alpha"]]
   :main govuk.blinken)
