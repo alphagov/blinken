@@ -51,6 +51,33 @@
       (is (has-class? html "down-hosts"))
       (is (has-content? html "foo")))))
 
+(deftest test-alerts
+  (testing "only ok alerts"
+    (let [html (dashboard/alerts {:ok ["doesnt matter"] :warning []
+                                  :critical [] :unknown []})]
+      (is (has-class? html "ok"))
+      (is (element-has-content? html "ok" 1))
+      (is (has-class? html "warning"))
+      (is (element-has-content? html "warning" 0))
+      (is (has-class? html "critical"))
+      (is (element-has-content? html "critical" 0))
+      (is (has-class? html "unknown"))
+      (is (element-has-content? html "unknown" 0))
+      (is (not (has-class? html "problem-alerts")))))
+  
+  (testing "with problem alerts"
+    (let [html (dashboard/alerts {:ok []
+                                  :warning [{:host "h1" :name "n1" :info "i1"}]
+                                  :critical [{:host "h2" :name "n2" :info "i2"}]
+                                  :unknown [{:host "h3" :name "n3" :info "i3"}]})]
+      (is (element-has-content? html "ok" 0))
+      (is (element-has-content? html "warning" 1))
+      (is (element-has-content? html "critical" 1))
+      (is (element-has-content? html "unknown" 1))
+      (for [i (range 1 3)]
+        (do (is (has-content? html (str "h" i)))
+            (is (has-content? html (str "n" i)))
+            (is (has-content? html (str "i" i))))))))
 
 (deftest test-generate-structure
   (testing "has correct number of services"
