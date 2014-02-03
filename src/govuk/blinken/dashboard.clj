@@ -42,8 +42,9 @@
   (let [critical-count (-> service :alerts :critical count)]
     [:a {:href (str "/" (:id service))
          :class (str "service-overview " (if (> critical-count 0) "critical" "ok"))} 
-      [:h2 (:name service)]
-      [:div {:class "count"} critical-count]]))
+     [:h2 (:name service)]
+     (if (> critical-count 0)
+       [:div {:class "count"} critical-count])]))
 
 (defn services-overview [services]
   (for [service services] (service-overview service)))
