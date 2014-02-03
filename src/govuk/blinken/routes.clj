@@ -7,7 +7,8 @@
 (defn build [services]
   (routes
    (GET "/" []
-        (dashboard/generate (map #(assoc (-> % :worker service/get-status)
-                                    :name (:name %))
+        (dashboard/generate (map (fn [[key config]]
+                                   (assoc (-> config :worker service/get-status)
+                                     :name (:name config)))
                                  services)))))
 

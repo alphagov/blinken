@@ -13,23 +13,24 @@
 (def type-to-worker-fn {"icinga" icinga/create
                         "sensu" sensu/create})
 
-(defn- create-services [services-config]
-  (filter #(-> % nil? not)
-          (map (fn [[key config]]
-                 (let [service-name (name key)]
-                   (if (and (:type config) (:url config))
-                     (if-let [worker-fn (type-to-worker-fn (:type config))]
-                       (assoc {} :name service-name
-                              :worker (worker-fn (:url config) (:options config)))
-                       (println "Invalid type for service " service-name))
-                     (println "Please provide both a type and url for" service-name))))
-               services-config)))
+(defn- create-services [services-config type-to-worker-fn]
+  (reduce (fn [services [key config]]
+            (if (and (:type config) (:url config))
+              (if-let [worker-fn (type-to-worker-fn (:type config))]
+                (assoc services (name key) {:name (get config :name (name key))
+                                            :worker (worker-fn (:url config)
+                                                               (:options config))})
+                (do (println "Invalid type for service " (name key))
+                    services))
+              (do (println "Please provide both a type and url for" (name key))
+                  services)))
+          {} services-config))
 
-(defn load-config [path]
+(defn load-config [path type-to-worker-fn]
   (if-let [file (io/as-file path)]
     (if (.exists (io/as-file file))
       (let [raw (yaml/parse-string (slurp file))]
-        (assoc raw :services (create-services (:services raw)))))))
+        (assoc raw :services (create-services (:services raw) type-to-worker-fn))))))
 
 
 (def usage "Blinken
@@ -62,8 +63,9 @@ Options:
      :else
      (let [config-path (arg-map "<config-path>")
            port (Integer/parseInt (arg-map "--port"))]
-       (if-let [config (load-config config-path)]
-         (do (doall (map #(service/start (:worker %)) (:services config)))
+       (if-let [config (load-config config-path type-to-worker-fn)]
+         (do (doall (map (fn [[key config]]
+                           (service/start (:worker config))) (:services config)))
              (httpkit/run-server (routes/build (:services config))
                                  {:port port})
              (println "Started web server on" port))
