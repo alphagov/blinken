@@ -36,10 +36,3 @@
               :alerts {:critical [] :warning [] :ok [] :unknown []}})))))
 
 
-(deftest test-poll
-  (let [count (atom 0)
-        poller (icinga/poll 10 (fn [count] (swap! count inc)) count)]
-    (Thread/sleep 500)
-    (let [times (icinga/cancel-poll poller)]
-      (is (= @count times)))))
-

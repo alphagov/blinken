@@ -2,7 +2,8 @@
   (:require [org.httpkit.client :as http]
             [cheshire.core :as json]
             [clojure.core.async :as async]
-            [govuk.blinken.protocols :as protocols]))
+            [govuk.blinken.protocols :as protocols]
+            [govuk.blinken.util :as util]))
 
 (defn- handle-response [status-atom status-keyword parse-fn response]
   (cond (:error response)
@@ -59,36 +60,19 @@
 
 
 
-(defn poll [ms func & args]
-  (let [control (async/chan)
-        times (atom 0)
-        out (async/go (loop [[v ch] (async/alts! [(async/timeout 0) control])]
-                        (if (= ch control)
-                          @times
-                          (do (swap! times inc)
-                              (apply func args)
-                              (recur (async/alts! [(async/timeout ms) control]))))))]
-    {:control control :out out}))
-
-(defn cancel-poll [chans]
-  (async/>!! (:control chans) :cancel)
-  (async/<!! (:out chans)))
-
-
-
 (deftype IcingaService [url options status-atom poller-atom]
   protocols/Service
   (start [this] (let [poll-ms (get options :poll-ms 1000)]
                   (println (str "Starting Icinga poller [ms:" poll-ms ", url:" url "]"))
                   (reset! poller-atom
-                          (poll poll-ms
-                                (fn [status-atom]
-                                  (get-hosts url status-atom)
-                                  (get-alerts url status-atom))
-                                status-atom))))
+                          (util/poll poll-ms
+                                     (fn [status-atom]
+                                       (get-hosts url status-atom)
+                                       (get-alerts url status-atom))
+                                     status-atom))))
   (get-status [this] @status-atom)
   (stop [this] (if-let [poller @poller-atom]
-                 (do (cancel-poll poller)
+                 (do (util/cancel-poll poller)
                      (reset! poller-atom nil)
                      (println "Killed Icinga poller")))))
 
