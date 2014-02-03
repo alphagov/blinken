@@ -38,6 +38,12 @@
         (list-alerts (:warning alerts))
         (list-alerts (:unknown alerts))])]))
 
+(defn service-overview [service]
+  [:div {:class "service-overview"}
+   [:h2 (:name service)]
+   [:div {:class "count"}
+    (-> service :alerts :critical count)]])
+
 (defn generate-structure [services]
   [:head [:title "Blinken"]]
   [:body (for [service services]

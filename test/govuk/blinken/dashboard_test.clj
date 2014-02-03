@@ -79,6 +79,13 @@
             (is (has-content? html (str "n" i)))
             (is (has-content? html (str "i" i))))))))
 
+(deftest test-service-overview
+  (testing "general layout"
+    (let [html (dashboard/service-overview {:name "Some Service!"
+                                            :alerts {:critical [1 2 3]}})]
+      (is (element-has-content? html "count" 3))
+      (is (has-content? html "Some Service!")))))
+
 (deftest test-generate-structure
   (testing "has correct number of services"
     (let [html (dashboard/generate-structure [{:name "GOV.UK Production" :hosts {:up [] :down []}}
