@@ -40,9 +40,12 @@
 
 (defn service-overview [service]
   [:div {:class "service-overview"}
-   [:h2 (:name service)]
+   [:a {:href (str "/" (:id service))} [:h2 (:name service)]]
    [:div {:class "count"}
     (-> service :alerts :critical count)]])
+
+(defn services-overview [services]
+  (for [service services] (service-overview service)))
 
 (defn service-detail [service]
   [:div {:class "service"}
@@ -61,7 +64,6 @@
     [:h1 title]]
    body])
 
-(defn generate [services]
-  (page/html5 (generate-structure "List of services"
-                                  (services-detail services))))
+(defn generate [& body]
+  (page/html5 (generate-structure "List of services" body)))
 
