@@ -6,4 +6,4 @@ A dashboard to integrate multiple alert systems
 
 Crown Copyright
 
-Distributed under the Open Government License v2
+Distributed under the MIT license
