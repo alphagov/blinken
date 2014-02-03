@@ -95,8 +95,6 @@
       (is (has-content? html "Home"))
       (is (has-content? html "List of services"))
       (is (= (num-elements-with-class html "service") 2))
-      (is (= (num-elements-with-class html "host-status") 2))
-      (is (has-content? html "GOV.UK Production"))
-      (is (has-content? html "GOV.UK Staging")))))
+      (is (= (num-elements-with-class html "host-status") 2)))))
 
 

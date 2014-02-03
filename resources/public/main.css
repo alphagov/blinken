@@ -1,0 +1,86 @@
+
+body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    padding: 20px;
+}
+
+header {
+    line-height: 40px;
+}
+
+header a {
+    color: transparent;
+    background-size: 80px 60px;
+    width: 52px;
+    height: 30px;
+    display: inline-block;
+    background-position: -14px -15px;
+    display: inline-block;
+    margin-top: 10px;
+    margin-right: 10px;
+}
+
+header a {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" width="32px" height="32px" viewBox="0 0 32 32" enable-background="new 0 0 32 32" xml:space="preserve"><path id="view" d="M16,8.318c-7.545,0-13.5,7.714-13.5,7.714s5.954,7.715,13.5,7.715c5.771,0,13.5-7.716,13.5-7.716  S21.771,8.318,16,8.318z M16,20.839c-2.649,0-4.807-2.156-4.807-4.809c0-2.648,2.158-4.808,4.807-4.808  c2.648,0,4.807,2.158,4.807,4.808C20.807,18.681,18.648,20.839,16,20.839z M16,13.226c-1.549,0-2.806,1.256-2.806,2.806  S14.45,18.839,16,18.839s2.807-1.258,2.807-2.809C18.807,14.483,17.55,13.226,16,13.226z" fill="#ccc"/></svg>');
+}
+
+header a:hover {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" width="32px" height="32px" viewBox="0 0 32 32" enable-background="new 0 0 32 32" xml:space="preserve"><path id="view" d="M16,8.318c-7.545,0-13.5,7.714-13.5,7.714s5.954,7.715,13.5,7.715c5.771,0,13.5-7.716,13.5-7.716  S21.771,8.318,16,8.318z M16,20.839c-2.649,0-4.807-2.156-4.807-4.809c0-2.648,2.158-4.808,4.807-4.808  c2.648,0,4.807,2.158,4.807,4.808C20.807,18.681,18.648,20.839,16,20.839z M16,13.226c-1.549,0-2.806,1.256-2.806,2.806  S14.45,18.839,16,18.839s2.807-1.258,2.807-2.809C18.807,14.483,17.55,13.226,16,13.226z" fill="#2f0046"/></svg>');
+}
+
+header h1 {
+    display: inline-block;
+    margin: 0;
+    font-weight: normal;
+}
+
+
+.service-overview {
+    display: inline-block;
+    position: relative;
+    margin-right: 20px;
+    overflow: hidden;
+    width: 260px;
+    height: 160px;
+    padding: 10px;
+    color: #fff;
+    text-decoration: none;
+    margin-top: 20px;
+}
+
+.service-overview:hover {
+    text-decoration: underline;
+}
+
+.service-overview h2 {
+    font-weight: normal;
+    padding: 0;
+    margin: 0;
+    font-size: 28px;
+}
+
+.service-overview.critical {
+    background-color: rgba(255, 0, 0, 0.8);
+}
+
+.service-overview.ok {
+    background-color: rgba(0, 128, 0, 0.8)
+}
+
+.service-overview .count {
+    position: absolute;
+    bottom: 12px;
+    right: 20px;
+    font-size: 40px;
+    color: white;
+}
+
+.service-overview.critical .count {
+    font-size: 80px;
+    font-weight: bold;
+    bottom: 4px;
+}
+
+

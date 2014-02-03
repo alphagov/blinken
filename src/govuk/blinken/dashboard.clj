@@ -39,17 +39,17 @@
         (list-alerts (:unknown alerts))])]))
 
 (defn service-overview [service]
-  [:div {:class "service-overview"}
-   [:a {:href (str "/" (:id service))} [:h2 (:name service)]]
-   [:div {:class "count"}
-    (-> service :alerts :critical count)]])
+  (let [critical-count (-> service :alerts :critical count)]
+    [:a {:href (str "/" (:id service))
+         :class (str "service-overview " (if (> critical-count 0) "critical" "ok"))} 
+      [:h2 (:name service)]
+      [:div {:class "count"} critical-count]]))
 
 (defn services-overview [services]
   (for [service services] (service-overview service)))
 
 (defn service-detail [service]
   [:div {:class "service"}
-   [:h2 (:name service)]
    (host-status (:hosts service))
    (alerts (:alerts service))])
 
@@ -57,13 +57,16 @@
   (for [service services] (service-detail service)))
 
 (defn generate-structure [title & body]
-  [:head [:title (str title " - Blinken")]]
-  [:body
-   [:header
-    [:a {:href "/"} "Home"]
-    [:h1 title]]
-   body])
+  [:html
+   [:head
+    [:title (str title " - Blinken")]
+    (page/include-css "/static/main.css")]
+   [:body
+    [:header
+     [:a {:href "/"} "Home"]
+     [:h1 title]]
+    body]])
 
-(defn generate [& body]
-  (page/html5 (generate-structure "List of services" body)))
+(defn generate [title & body]
+  (page/html5 (generate-structure title body)))
 
