@@ -44,14 +44,24 @@
    [:div {:class "count"}
     (-> service :alerts :critical count)]])
 
-(defn generate-structure [services]
-  [:head [:title "Blinken"]]
-  [:body (for [service services]
-           [:div {:class "service"}
-            [:h1 (:name service)]
-            (host-status (:hosts service))
-            (alerts (:alerts service))])])
+(defn service-detail [service]
+  [:div {:class "service"}
+   [:h2 (:name service)]
+   (host-status (:hosts service))
+   (alerts (:alerts service))])
+
+(defn services-detail [services]
+  (for [service services] (service-detail service)))
+
+(defn generate-structure [title & body]
+  [:head [:title (str title " - Blinken")]]
+  [:body
+   [:header
+    [:a {:href "/"} "Home"]
+    [:h1 title]]
+   body])
 
 (defn generate [services]
-  (page/html5 (generate-structure services)))
+  (page/html5 (generate-structure "List of services"
+                                  (services-detail services))))
 

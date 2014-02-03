@@ -88,8 +88,12 @@
 
 (deftest test-generate-structure
   (testing "has correct number of services"
-    (let [html (dashboard/generate-structure [{:name "GOV.UK Production" :hosts {:up [] :down []}}
-                                              {:name "GOV.UK Staging" :hosts {:up [] :down []}}])]
+    (let [services [{:name "GOV.UK Production" :hosts {:up [] :down []}}
+                    {:name "GOV.UK Staging" :hosts {:up [] :down []}}]
+          services-html (dashboard/services-detail services)
+          html (dashboard/generate-structure "List of services" services-html)]
+      (is (has-content? html "Home"))
+      (is (has-content? html "List of services"))
       (is (= (num-elements-with-class html "service") 2))
       (is (= (num-elements-with-class html "host-status") 2))
       (is (has-content? html "GOV.UK Production"))
