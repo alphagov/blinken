@@ -1,6 +1,6 @@
-(ns govuk.blinken.util-test
+(ns govuk.blinken.service.polling-test
   (:require [clojure.test :refer :all]
-            [govuk.blinken.util :refer :all]))
+            [govuk.blinken.service.polling :refer :all]))
 
 
 (deftest test-poll

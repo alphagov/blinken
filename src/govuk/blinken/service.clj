@@ -1,4 +1,4 @@
-(ns govuk.blinken.protocols)
+(ns govuk.blinken.service)
 
 (defprotocol Service
   (start [this] "Start pulling data")

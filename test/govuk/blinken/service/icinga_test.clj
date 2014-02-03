@@ -1,9 +1,9 @@
-(ns govuk.blinken.icinga-test
+(ns govuk.blinken.service.icinga-test
   (:require [clojure.test :refer :all]
             [clojure.java.io :as io]
             [cheshire.core :as json]
-            [govuk.blinken.icinga :as icinga]
-            [govuk.blinken.protocols :as protocols]))
+            [govuk.blinken.service.icinga :as icinga]
+            [govuk.blinken.service :as service]))
 
 (def example-hosts-json
   (json/parse-string (slurp (io/resource "fixtures/icinga/hosts.json")) true))
@@ -30,8 +30,8 @@
 
 (deftest test-create
   (testing "it creates a service"
-    (let [service (icinga/create "http://foo" {})]
-      (is (= (protocols/get-status service)
+    (let [i-service (icinga/create "http://foo" {})]
+      (is (= (service/get-status i-service)
              {:hosts {:up [] :down []}
               :alerts {:critical [] :warning [] :ok [] :unknown []}})))))
 

@@ -2,11 +2,11 @@
   (:require [docopt.core :as dc]
             [docopt.match :as dm]
             [clojure.java.io :as io]
-            [govuk.blinken.icinga :as icinga]
-            [govuk.blinken.sensu :as sensu]
+            [govuk.blinken.service.icinga :as icinga]
+            [govuk.blinken.service.sensu :as sensu]
             [clj-yaml.core :as yaml]
             [org.httpkit.server :as httpkit]
-            [govuk.blinken.protocols :as protocols]
+            [govuk.blinken.service :as service]
             [govuk.blinken.routes :as routes]))
 
 
@@ -63,7 +63,7 @@ Options:
      (let [config-path (arg-map "<config-path>")
            port (Integer/parseInt (arg-map "--port"))]
        (if-let [config (load-config config-path)]
-         (do (doall (map #(protocols/start (:worker %)) (:services config)))
+         (do (doall (map #(service/start (:worker %)) (:services config)))
              (httpkit/run-server (routes/build (:services config))
                                  {:port port})
              (println "Started web server on" port))

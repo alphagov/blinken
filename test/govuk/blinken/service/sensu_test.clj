@@ -1,9 +1,9 @@
-(ns govuk.blinken.sensu-test
+(ns govuk.blinken.service.sensu-test
   (:require [clojure.test :refer :all]
             [clojure.java.io :as io]
             [cheshire.core :as json]
-            [govuk.blinken.sensu :as sensu]
-            [govuk.blinken.protocols :as protocols]))
+            [govuk.blinken.service.sensu :as sensu]
+            [govuk.blinken.service :as service]))
 
 
 (def example-hosts-json
@@ -34,8 +34,8 @@
 
 (deftest test-create
   (testing "it creates a service"
-    (let [service (sensu/create "http://foo" {})]
-      (is (= (protocols/get-status service)
+    (let [s-service (sensu/create "http://foo" {})]
+      (is (= (service/get-status s-service)
              {:hosts {:up [] :down []}
               :alerts {:critical [] :warning [] :ok [] :unknown []}})))))
 
