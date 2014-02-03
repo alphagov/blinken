@@ -3,13 +3,15 @@
             [docopt.match :as dm]
             [clojure.java.io :as io]
             [govuk.blinken.icinga :as icinga]
+            [govuk.blinken.sensu :as sensu]
             [clj-yaml.core :as yaml]
             [org.httpkit.server :as httpkit]
             [govuk.blinken.protocols :as protocols]
             [govuk.blinken.routes :as routes]))
 
 
-(def type-to-worker-fn {"icinga" icinga/create})
+(def type-to-worker-fn {"icinga" icinga/create
+                        "sensu" sensu/create})
 
 (defn- create-services [services-config]
   (filter #(-> % nil? not)

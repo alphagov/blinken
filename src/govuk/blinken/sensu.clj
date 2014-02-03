@@ -1,4 +1,4 @@
-(ns govuk.blinken.icinga
+(ns govuk.blinken.sensu
   (:require [org.httpkit.client :as http]
             [cheshire.core :as json]
             [clojure.core.async :as async]
@@ -17,54 +17,44 @@
         (println "Unknown request error:" response)))
 
 
-
-(defn- parse-host [hosts host]
-  (let [status (:status host)
-        status-keyword (if (= status "UP") :up :down)
-        current-list (hosts status-keyword)]
-    (assoc hosts status-keyword (conj current-list (:host_name host)))))
-
-(defn parse-hosts [hosts-json]
-  (reduce parse-host
-          {:up [] :down []}
-          (-> hosts-json :status :host_status)))
+(defn parse-hosts [hosts-json] hosts-json
+  {:up (map :name hosts-json)
+   :down []})
 
 (defn get-hosts [base-url options status-atom]
-  (http/get (str base-url "/cgi-bin/icinga/status.cgi?style=hostdetail&jsonoutput")
+  (http/get (str base-url "/clients")
             options
             (partial handle-response status-atom :hosts parse-hosts)))
 
 
 
+(def status-to-type {0 :ok 1 :warning 2 :critical 3 :unknown})
+
 (defn- parse-alert [alerts alert]
-  (let [status (:status alert)
-        status-keyword (cond (= status "OK") :ok
-                             (= status "CRITICAL") :critical
-                             (= status "WARNING") :warning
-                             :else :unknown)
+  (let [status-keyword (status-to-type (:status alert))
         current-list (alerts status-keyword)]
     (assoc alerts status-keyword (conj current-list
-                                       {:host (:host_name alert)
-                                        :name (:service_description alert)
-                                        :info (:status_information alert)}))))
+                                       {:host (:client alert)
+                                        :name (:check alert)
+                                        :info (:output alert)}))))
 
 (defn parse-alerts [alerts-json]
   (reduce parse-alert
           {:critical [] :warning [] :ok [] :unknown []}
-          (-> alerts-json :status :service_status)))
+          alerts-json))
 
 (defn get-alerts [base-url options status-atom]
-  (http/get (str base-url "/cgi-bin/icinga/status.cgi?jsonoutput")
+  (http/get (str base-url "/events")
             options
             (partial handle-response status-atom :alerts parse-alerts)))
 
 
 
-(deftype IcingaService [url options status-atom poller-atom]
+(deftype SensuService [url options status-atom poller-atom]
   protocols/Service
   (start [this] (let [poll-ms (get options :poll-ms 1000)
                       http-options (get options :http {})]
-                  (println (str "Starting Icinga poller [ms:" poll-ms ", url:" url "]"))
+                  (println (str "Starting Sensu poller [ms:" poll-ms ", url:" url "]"))
                   (reset! poller-atom
                           (util/poll poll-ms
                                      (fn [status-atom]
@@ -75,11 +65,10 @@
   (stop [this] (if-let [poller @poller-atom]
                  (do (util/cancel-poll poller)
                      (reset! poller-atom nil)
-                     (println "Killed Icinga poller")))))
-
+                     (println "Killed Sensu poller")))))
 
 (defn create [url options]
-  (let [status-atom (atom {:hosts  {:up [] :down []}
+  (let [status-atom (atom {:hosts {:up [] :down []}
                            :alerts {:critical [] :warning [] :ok [] :unknown []}})]
-    (IcingaService. url options status-atom (atom nil))))
+    (SensuService. url options status-atom (atom nil))))
 
