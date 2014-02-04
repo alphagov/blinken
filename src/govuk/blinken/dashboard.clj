@@ -56,7 +56,9 @@
          :class (str "service-overview " (name level))} 
      [:h2 (:name service)]
      (if (not (or (= level :ok) (= level :no-data)))
-       [:div {:class "count"} (str critical-count "-" warning-count)])]))
+       [:div {:class "count"}
+        (if (= level :critical) [:div {:class "critical"} critical-count])
+        [:div {:class "warning"} warning-count]])]))
 
 (defn services-overview [services]
   (for [service services] (service-overview service)))

@@ -78,17 +78,23 @@ header h1 {
 }
 
 .service-overview .count {
-    position: absolute;
-    bottom: 12px;
-    right: 20px;
-    font-size: 40px;
-    color: white;
-}
-
-.service-overview.critical .count {
     font-size: 80px;
     font-weight: bold;
-    bottom: 4px;
+    color: rgba(255, 255, 255, 1);
 }
+
+.service-overview .count .critical {
+    position: absolute;
+    bottom: 0;
+    left: 10px;
+}
+
+.service-overview .count .warning {
+    position: absolute;
+    bottom: 0;
+    right: 10px;
+    color: rgba(255, 255, 255, 0.5);
+}
+
 
 

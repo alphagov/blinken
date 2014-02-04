@@ -11,18 +11,21 @@
   (let [flat-html (flatten html)]
     (some #(= % content) flat-html)))
 
-(defn- children [element]
-  (if (vector? element)
-    (let [position (if (map? (second element)) 2 1)]
-      (vec (filter #(and (not (nil? %))
-                         (vector? %)) (nthrest element position))))
-    nil))
+(defn- children
+  ([element] (children element false))
+  ([element with-values?]
+     (if (vector? element)
+       (let [position (if (map? (second element)) 2 1)]
+         (vec (filter #(and (not (nil? %))
+                            (or with-values? (vector? %))) (nthrest element position))))
+       nil)))
 
 (defn element-has-content? [html class content]
   (let [results (clojure.walk/prewalk (fn [element]
                                         (if (and (map? (second element))
                                                  (= (:class (second element)) class)
-                                                 (= (nth element 2) content))
+                                                 (some #(= % content)
+                                                       (flatten (children element true))))
                                           :found
                                           (children element))) html)]
     (some #(= % :found) (flatten results))))
@@ -98,7 +101,8 @@
                                             :alerts {:critical [1 2 3]
                                                      :warning []}})]
       (is (has-class? html "service-overview critical"))
-      (is (element-has-content? html "count" "3-0"))
+      (is (element-has-content? html "critical" 3))
+      (is (element-has-content? html "warning" 0))
       (is (has-content? html "Some Service!"))))
 
   (testing "warning overview"
@@ -106,19 +110,22 @@
                                             :alerts {:critical []
                                                      :warning [1 2 3]}})]
       (is (has-class? html "service-overview warning"))
-      (is (element-has-content? html "count" "0-3"))))
+      (is (not (has-class? html "critical")))
+      (is (element-has-content? html "warning" 3))))
 
   (testing "ok overview"
     (let [html (dashboard/service-overview {:name "Some Service!"
                                             :alerts {:critical []
                                                      :warning []}})]
       (is (has-class? html "service-overview ok"))
-      (is (not (has-class? html "count")))))
+      (is (not (has-class? html "critical")))
+      (is (not (has-class? html "warning")))))
 
   (testing "no data overview"
     (let [html (dashboard/service-overview {:name "Some Service!"
                                             :alerts nil})]
-      (is (has-class? html "service-overview no-data")))))
+      (is (has-class? html "service-overview no-data"))
+      (is (not (has-class? html "count"))))))
 
 (deftest test-generate-structure
   (testing "has correct number of services"
