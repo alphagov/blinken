@@ -6,11 +6,11 @@
 
 (defn- get-status
   ([services]
-     (map (fn [[key config]]
-            (assoc (-> config :worker service/get-status)
-              :name (:name config)
-              :id key))
-          services))
+     (reverse (map (fn [[key config]]
+                     (assoc (-> config :worker service/get-status)
+                       :name (:name config)
+                       :id key))
+                   services)))
   ([key services]
      (if-let [config (services key)]
        (assoc (-> config :worker service/get-status)
