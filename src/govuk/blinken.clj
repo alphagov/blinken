@@ -64,8 +64,8 @@ Options:
      (let [config-path (arg-map "<config-path>")
            port (Integer/parseInt (arg-map "--port"))]
        (if-let [config (load-config config-path type-to-worker-fn)]
-         (do (doall (map (fn [[key config]]
-                           (service/start (:worker config))) (:services config)))
+         (do (doseq [[key config] (:services config)]
+               (service/start (:worker config)))
              (httpkit/run-server (routes/build (:services config))
                                  {:port port})
              (println "Started web server on" port))
