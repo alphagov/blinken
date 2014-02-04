@@ -11,3 +11,10 @@
       (is (= @count times)))))
 
 
+(deftest test-to-query-params
+  (let [query-params (to-query-params {:a "b"} {"c" "d"} {"e" 43587345})]
+    (is (= query-params
+           "?a=b&c=d&e=43587345"))))
+
+
+

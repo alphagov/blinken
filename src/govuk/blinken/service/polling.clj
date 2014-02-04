@@ -34,10 +34,20 @@
         :else
         (println "Unknown request error:" response)))
 
+(defn to-query-params [& hashes]
+  (let [all-params (reverse (apply merge hashes))]
+    (str "?" (clojure.string/join "&"
+                                  (map (fn [[key val]]
+                                         (str (http/url-encode (name key)) "="
+                                              (http/url-encode val)))
+                                       all-params)))))
+
 (defn- get-and-parse [base-url endpoint options status-atom status-key]
-  (http/get (str base-url (:resource endpoint)) options
-            (partial handle-response status-atom
-                     status-key (:parse-fn endpoint))))
+  (let [query-params (to-query-params (:query-params endpoint)
+                                      {"cachebuster" (System/currentTimeMillis)})
+        url (str base-url (:resource endpoint) query-params)]
+    (http/get url options (partial handle-response status-atom
+                                   status-key (:parse-fn endpoint)))))
 
 
 (deftype PollingService [url poller-options user-options status-atom poller-atom]

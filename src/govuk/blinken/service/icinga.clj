@@ -34,12 +34,25 @@
           (-> alerts-json :status :service_status)))
 
 
+(defn deep-merge
+  "Recursively merges maps. If keys are not maps, the last value wins."
+  [& vals]
+  (if (every? map? vals)
+    (apply merge-with deep-merge vals)
+    (last vals)))
+
 
 (defn create [url options]
-  (polling/create url {:alerts {:resource "/cgi-bin/icinga/status.cgi?jsonoutput"
-                                :parse-fn parse-alerts}
-                       :hosts {:resource "/cgi-bin/icinga/status.cgi?style=hostdetail&jsonoutput"
-                               :parse-fn parse-hosts}} options))
+  (polling/create url {:alerts (deep-merge {:resource "/cgi-bin/icinga/status.cgi"
+                                            :query-params {:servicestatustypes 20
+                                                           "jsonoutput" 1}
+                                            :parse-fn parse-alerts}
+                                           (get options :alerts {}))
+                       :hosts (deep-merge {:resource "/cgi-bin/icinga/status.cgi"
+                                           :query-params {"style" "hostdetail"
+                                                          "jsonoutput" 1}
+                                           :parse-fn parse-hosts}
+                                          (get options :hosts {}))} options))
 
 
 
