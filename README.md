@@ -1,4 +1,4 @@
-# Blinken
+# Blinken [![Build Status](https://travis-ci.org/alphagov/blinken.png?branch=master)](https://travis-ci.org/alphagov/blinken)
 
 A dashboard to integrate multiple alert systems
 
