@@ -39,12 +39,16 @@
         (list-alerts (:unknown alerts))])]))
 
 (defn service-overview [service]
-  (let [critical-count (-> service :alerts :critical count)]
+  (let [critical-count (-> service :alerts :critical count)
+        warning-count (-> service :alerts :warning count)
+        level (cond (> critical-count 0) :critical
+                    (> warning-count 0) :warning
+                    :else :ok)]
     [:a {:href (str "/" (:id service))
-         :class (str "service-overview " (if (> critical-count 0) "critical" "ok"))} 
+         :class (str "service-overview " (name level))} 
      [:h2 (:name service)]
-     (if (> critical-count 0)
-       [:div {:class "count"} critical-count])]))
+     (if (not (= level :ok))
+       [:div {:class "count"} (str critical-count "-" warning-count)])]))
 
 (defn services-overview [services]
   (for [service services] (service-overview service)))

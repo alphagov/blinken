@@ -82,9 +82,25 @@
 (deftest test-service-overview
   (testing "general layout"
     (let [html (dashboard/service-overview {:name "Some Service!"
-                                            :alerts {:critical [1 2 3]}})]
-      (is (element-has-content? html "count" 3))
-      (is (has-content? html "Some Service!")))))
+                                            :alerts {:critical [1 2 3]
+                                                     :warning []}})]
+      (is (has-class? html "service-overview critical"))
+      (is (element-has-content? html "count" "3-0"))
+      (is (has-content? html "Some Service!"))))
+
+  (testing "warning overview"
+    (let [html (dashboard/service-overview {:name "Some Service!"
+                                            :alerts {:critical []
+                                                     :warning [1 2 3]}})]
+      (is (has-class? html "service-overview warning"))
+      (is (element-has-content? html "count" "0-3"))))
+
+  (testing "ok overview"
+    (let [html (dashboard/service-overview {:name "Some Service!"
+                                            :alerts {:critical []
+                                                     :warning []}})]
+      (is (has-class? html "service-overview ok"))
+      (is (not (has-class? html "count"))))))
 
 (deftest test-generate-structure
   (testing "has correct number of services"

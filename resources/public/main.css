@@ -42,8 +42,8 @@ header h1 {
     position: relative;
     margin-right: 20px;
     overflow: hidden;
-    width: 260px;
-    height: 160px;
+    width: 320px;
+    height: 200px;
     padding: 10px;
     color: #fff;
     text-decoration: none;
@@ -63,6 +63,10 @@ header h1 {
 
 .service-overview.critical {
     background-color: rgba(255, 0, 0, 0.8);
+}
+
+.service-overview.warning {
+    background-color: #ffcc05;
 }
 
 .service-overview.ok {
