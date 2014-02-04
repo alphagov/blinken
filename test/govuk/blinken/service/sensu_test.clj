@@ -36,8 +36,8 @@
   (testing "it creates a service"
     (let [s-service (sensu/create "http://foo" {})]
       (is (= (service/get-status s-service)
-             {:hosts {:up [] :down []}
-              :alerts {:critical [] :warning [] :ok [] :unknown []}})))))
+             {:hosts nil
+              :alerts nil})))))
 
 
 

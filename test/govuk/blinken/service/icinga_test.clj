@@ -32,7 +32,7 @@
   (testing "it creates a service"
     (let [i-service (icinga/create "http://foo" {})]
       (is (= (service/get-status i-service)
-             {:hosts {:up [] :down []}
-              :alerts {:critical [] :warning [] :ok [] :unknown []}})))))
+             {:hosts nil
+              :alerts nil})))))
 
 

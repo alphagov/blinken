@@ -73,6 +73,10 @@ header h1 {
     background-color: rgba(0, 128, 0, 0.8)
 }
 
+.service-overview.no-data {
+    background-color: #ccc;
+}
+
 .service-overview .count {
     position: absolute;
     bottom: 12px;

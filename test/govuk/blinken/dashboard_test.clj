@@ -49,7 +49,13 @@
       (is (has-class? html "down"))
       (is (element-has-content? html "down" 1))
       (is (has-class? html "down-hosts"))
-      (is (has-content? html "foo")))))
+      (is (has-content? html "foo"))))
+
+  (testing "no host data"
+    (let [html (dashboard/host-status nil)]
+      (is (has-class? html "host-status"))
+      (is (has-content? html "Hosts"))
+      (is (has-content? html "No data")))))
 
 (deftest test-alerts
   (testing "only ok alerts"
@@ -77,7 +83,14 @@
       (for [i (range 1 3)]
         (do (is (has-content? html (str "h" i)))
             (is (has-content? html (str "n" i)))
-            (is (has-content? html (str "i" i))))))))
+            (is (has-content? html (str "i" i)))))))
+
+  (testing "no alert data"
+    (let [html (dashboard/alerts nil)]
+      (is (has-class? html "alerts"))
+      (is (has-content? html "Alerts"))
+      (is (has-content? html "No data"))
+      (is (not (has-class? html "problem-alerts"))))))
 
 (deftest test-service-overview
   (testing "general layout"
@@ -100,7 +113,12 @@
                                             :alerts {:critical []
                                                      :warning []}})]
       (is (has-class? html "service-overview ok"))
-      (is (not (has-class? html "count"))))))
+      (is (not (has-class? html "count")))))
+
+  (testing "no data overview"
+    (let [html (dashboard/service-overview {:name "Some Service!"
+                                            :alerts nil})]
+      (is (has-class? html "service-overview no-data")))))
 
 (deftest test-generate-structure
   (testing "has correct number of services"
