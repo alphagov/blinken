@@ -85,7 +85,7 @@ h2 a:hover {
 }
 
 .environment-overview.ok {
-    background-color: rgba(0, 128, 0, 0.8)
+    background-color: rgba(0, 128, 0, 0.8);
 }
 
 .environment-overview.no-data {
@@ -111,5 +111,59 @@ h2 a:hover {
     color: rgba(255, 255, 255, 0.5);
 }
 
+
+
+.alerts h3,
+.host-status h3  { 
+    display: inline-block; 
+    font-size: 24px;
+    font-weight: normal;
+    margin: 0 0 10px 0;
+    padding: 0;
+}
+
+.status-list {
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+}
+.status-list li { 
+    display: inline-block; 
+    margin-left: 10px;
+}
+.status-list .critical { color: rgba(255, 0, 0, 0.8); }
+.status-list .warning { color: #ffcc05; }
+.status-list .unknown { color: #ccc; }
+.status-list .ok { color: rgba(0, 128, 0, 0.8); }
+
+.alerts { margin-bottom: 40px; }
+
+.problem-alerts {
+    border-spacing: 0;
+}
+
+.problem-alerts thead {
+    font-weight: bold;
+}
+
+.problem-alerts tbody {
+    font-size: 12px;
+}
+
+.problem-alerts td {
+    padding: 5px;
+}
+
+.problem-alerts .status {
+    width: 10px;
+}
+
+
+.problem-alerts tr.critical td { border-bottom: 1px solid rgba(255,0,0,0.8); }
+.problem-alerts tr.warning td { border-bottom: 1px solid #ffcc05; }
+.problem-alerts tr.unknown td { border-bottom: 1px solid #ccc; }
+.problem-alerts .status.critical { background-color: rgba(255,0,0,0.8); }
+.problem-alerts .status.warning { background-color: #ffcc05; }
+.problem-alerts .status.unknown { background-color: #ccc; }
 
 

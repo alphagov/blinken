@@ -38,19 +38,19 @@
 (deftest test-host-status
   (testing "host status widget with just up"
     (let [html (dashboard/host-status {:up ["foo" "bar"] :down []})]
-      (is (has-class? html "up"))
-      (is (element-has-content? html "up" 2))
-      (is (has-class? html "down"))
-      (is (element-has-content? html "down" 0))
+      (is (has-class? html "ok"))
+      (is (element-has-content? html "ok" 2))
+      (is (has-class? html "critical"))
+      (is (element-has-content? html "critical" 0))
       (is (not (has-class? html "down-hosts")))
       (is (not (has-content? html "foo")))))
 
   (testing "host status widget with some down"
     (let [html (dashboard/host-status {:up [] :down ["foo"]})]
-      (is (has-class? html "up"))
-      (is (element-has-content? html "up" 0))
-      (is (has-class? html "down"))
-      (is (element-has-content? html "down" 1))
+      (is (has-class? html "ok"))
+      (is (element-has-content? html "ok" 0))
+      (is (has-class? html "critical"))
+      (is (element-has-content? html "critical" 1))
       (is (has-class? html "down-hosts"))
       (is (has-content? html "foo"))))
 
@@ -83,7 +83,7 @@
       (is (element-has-content? html "warning" 1))
       (is (element-has-content? html "critical" 1))
       (is (element-has-content? html "unknown" 1))
-      (for [i (range 1 3)]
+      (doseq [i (range 1 3)]
         (do (is (has-content? html (str "h" i)))
             (is (has-content? html (str "n" i)))
             (is (has-content? html (str "i" i)))))))

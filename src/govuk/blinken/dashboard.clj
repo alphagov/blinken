@@ -7,9 +7,10 @@
   (if status
     (let [num-down (count (:down status))]
       [:div {:class "host-status"}
-       [:h2 "Hosts"]
-       [:div "Up: " [:span {:class "up"} (count (:up status))]]
-       [:div "Down: " [:span {:class "down"} num-down]]
+       [:h3 "Hosts"]
+       [:ul {:class "status-list"}
+        [:li "Up: " [:span {:class "ok"} (count (:up status))]]
+        [:li "Down: " [:span {:class "critical"} num-down]]]
        (if (> num-down 0)
          [:ul {:class "down-hosts"}
           (for [down-host (:down status)]
@@ -17,12 +18,15 @@
     [:div {:class "host-status"}
      [:h2 "Hosts"] [:div "No data"]]))
 
-(defn- list-alerts [alerts]
-  (for [alert alerts]
-    [:li {:class "alert"}
-     [:div {:class "name"} (:name alert)]
-     [:div {:class "host"} (:host alert)]
-     [:div {:class "info"} (:info alert)]]))
+(defn- list-alerts [alerts status-class]
+  (let [max-i (- (count alerts) 1)]
+    (map-indexed (fn [i alert]
+                   [:tr {:class (str "alert " (if (= i max-i) status-class))}
+                    [:td {:class (str "status " status-class)}]
+                    [:td {:class "name"} (:name alert)]
+                    [:td {:class "host"} (:host alert)]
+                    [:td {:class "info"} (:info alert)]])
+                 alerts)))
 
 (defn alerts [alerts]  
   (if alerts
@@ -31,16 +35,18 @@
           num-critical (count (:critical alerts))
           num-unknown (count (:unknown alerts))]
       [:div {:class "alerts"}
-       [:h2 "Alerts"]
-       [:div "Ok: " [:span {:class "ok"} num-ok]]
-       [:div "Warning: " [:span {:class "warning"} num-warning]]
-       [:div "Critical: " [:span {:class "critical"} num-critical]]
-       [:div "Unknown: " [:span {:class "unknown"} num-unknown]]
+       [:h3 "Alerts"]
+       [:ul {:class "status-list"}
+        [:li "Ok: " [:span {:class "ok"} num-ok]]
+        [:li "Warning: " [:span {:class "warning"} num-warning]]
+        [:li "Critical: " [:span {:class "critical"} num-critical]]
+        [:li "Unknown: " [:span {:class "unknown"} num-unknown]]]
        (if (> (+ num-warning num-critical num-unknown) 0)
-         [:ul {:class "problem-alerts"}
-          (list-alerts (:critical alerts))
-          (list-alerts (:warning alerts))
-          (list-alerts (:unknown alerts))])])
+         [:table {:class "problem-alerts"}
+          [:thead [:tr [:td] [:td "Host"] [:td "Name"] [:td "Info"]]]
+          (list-alerts (:critical alerts) "critical")
+          (list-alerts (:warning alerts) "warning")
+          (list-alerts (:unknown alerts) "unknown")])])
     [:div {:class "alerts"}
      [:h2 "Alerts"]
      [:div "No data"]]))
