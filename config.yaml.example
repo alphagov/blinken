@@ -1,0 +1,56 @@
+
+# Blinken Example Config
+
+groups:
+  product:
+    # You can include a name, if omitted it will be the key
+    # used for the group
+    name: "Our Product"
+ 
+    environments:
+      production:
+        # As with a group, giving an environment a name is options
+        name: "Production"
+        type: icinga
+        url:  https://icinga.production
+        options:
+          # Configures the rate at which Blinken will poll the alerts
+          # software for hosts and alerts
+          poll-ms: 10000
+    
+          # You can provide query-parameters for use when requesting
+          # alerts or hosts, which with icinga can be useful for limiting
+          # what you receive. An example is:
+          #
+          # Translates to:
+          # Host Status Types:      All
+          # Host Properties:        Not In Scheduled Downtime
+          #                         And Has Not Been Acknowledged
+          #                         And In Hard State
+          # Service Status Types:   All problems
+          # Service Properties:     Not In Scheduled Downtime
+          #                         And Has Not Been Acknowledged
+          #                         And Notifications Enabled
+          #                         And In Hard State
+          alerts:
+            query-params:
+              hostprops: 262154
+              serviceprops: 270346
+              servicestatustypes: 28
+    
+          # You can provide options to be passed through to the underlying
+          # http client (http://http-kit.org/client.html#options)
+          http:
+            insecure?: true
+            basic-auth: ['prod', 'secure']
+        
+  ci:
+    environments:
+      main:
+        type: sensu
+        url: https://sensu.ci.main
+        options:
+          poll-ms: 10000
+          http:
+            insecure?: true
+    
