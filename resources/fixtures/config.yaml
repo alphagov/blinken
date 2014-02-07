@@ -1,14 +1,23 @@
 
 # Test config for Blinken
 
-services:
-  govuk-prod:
-    name: "GOV.UK Production"
-    type: icinga
-    url:  https://icinga.foo.production
-    options:
-      foo: bar
-  govuk-staging:
-    type: icinga
-    url:  https://icinga.foo.staging
+groups:
+  govuk:
+    name: "GOV.UK"
+    environments:
+      prod:
+        name: "Production"
+        type: icinga
+        url:  https://icinga.foo.production
+        options:
+          foo: bar
+      staging:
+        type: icinga
+        url:  https://icinga.foo.staging
+
+  another:
+    environments:
+      prod:
+        type: icinga
+        url:  http://foo
 

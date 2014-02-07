@@ -45,31 +45,40 @@
      [:h2 "Alerts"]
      [:div "No data"]]))
 
-(defn service-overview [service]
-  (let [critical-count (-> service :alerts :critical count)
-        warning-count (-> service :alerts :warning count)
-        level (cond (-> service :alerts not) :no-data
+(defn environment-overview [environment]
+  (let [critical-count (-> environment :alerts :critical count)
+        warning-count (-> environment :alerts :warning count)
+        level (cond (-> environment :alerts not) :no-data
                     (> critical-count 0) :critical
                     (> warning-count 0) :warning
                     :else :ok)]
-    [:a {:href (str "/" (:id service))
-         :class (str "service-overview " (name level))} 
-     [:h2 (:name service)]
+    [:a {:href (str "/" (:group-id environment) "/" (:id environment))
+         :class (str "environment-overview " (name level))} 
+     [:h3 (:name environment)]
      (if (not (or (= level :ok) (= level :no-data)))
        [:div {:class "count"}
         (if (= level :critical) [:div {:class "critical"} critical-count])
         [:div {:class "warning"} warning-count]])]))
 
-(defn services-overview [services]
-  (for [service services] (service-overview service)))
+(defn group-overview [group]
+  [:div {:class "group-overview"}
+   [:h2 [:a {:href (str "/" (:id group))} (:name group)]]
+   (for [environment (:environments group)]
+     (environment-overview environment))])
 
-(defn service-detail [service]
-  [:div {:class "service"}
-   (host-status (:hosts service))
-   (alerts (:alerts service))])
+(defn groups-overview [groups]
+  (map group-overview groups))
 
-(defn services-detail [services]
-  (for [service services] (service-detail service)))
+(defn environment-detail [environment]
+  [:div {:class "environment"}
+   (host-status (:hosts environment))
+   (alerts (:alerts environment))])
+
+(defn environments-detail [environments]
+  (for [environment environments]
+    [:div {:class "environment-container"}
+     [:h2 (:name environment)]
+     (environment-detail environment)]))
 
 (defn generate-structure [title & body]
   [:html

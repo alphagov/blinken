@@ -13,24 +13,35 @@
 (def type-to-worker-fn {"icinga" icinga/create
                         "sensu" sensu/create})
 
-(defn- create-services [services-config type-to-worker-fn]
-  (reduce (fn [services [key config]]
+(defn- create-environments [environments-config type-to-worker-fn]
+  (reduce (fn [environments [key config]]
             (if (and (:type config) (:url config))
               (if-let [worker-fn (type-to-worker-fn (:type config))]
-                (assoc services (name key) {:name (get config :name (name key))
-                                            :worker (worker-fn (:url config)
-                                                               (:options config))})
-                (do (println "Invalid type for service " (name key))
-                    services))
+                (assoc environments (name key) {:name (get config :name (name key))
+                                                :worker (worker-fn (:url config)
+                                                                   (:options config))})
+                (do (println "Invalid type for environment " (name key))
+                    environments))
               (do (println "Please provide both a type and url for" (name key))
-                  services)))
-          {} services-config))
+                  environments)))
+          {} environments-config))
+
+(defn- create-groups [groups-config type-to-worker-fn]
+  (reduce (fn [groups [key config]]
+            (let [environments (create-environments (:environments config)
+                                                    type-to-worker-fn)]
+              (if (empty? environments)
+                (do (println "No environments for group" (name key))
+                  groups)
+                (assoc groups (name key) {:name (get config :name (name key))
+                                          :environments environments}))))
+          {} groups-config))
 
 (defn load-config [path type-to-worker-fn]
   (if-let [file (io/as-file path)]
     (if (.exists (io/as-file file))
       (let [raw (yaml/parse-string (slurp file))]
-        (assoc raw :services (create-services (:services raw) type-to-worker-fn))))))
+        (assoc raw :groups (create-groups (:groups raw) type-to-worker-fn))))))
 
 
 (def usage "Blinken
@@ -64,9 +75,10 @@ Options:
      (let [config-path (arg-map "<config-path>")
            port (Integer/parseInt (arg-map "--port"))]
        (if-let [config (load-config config-path type-to-worker-fn)]
-         (do (doseq [[key config] (:services config)]
+         (do (doseq [[_ group] (:groups config)
+                     [key config] (-> group :environments vec)]
                (service/start (:worker config)))
-             (httpkit/run-server (routes/build (:services config))
+             (httpkit/run-server (routes/build (:groups config))
                                  {:port port})
              (println "Started web server on" port))
          (println "Config file does not exist:" config-path))))))

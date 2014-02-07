@@ -4,28 +4,45 @@
             [govuk.blinken.dashboard :as dashboard]
             [govuk.blinken.service :as service]))
 
-(defn- get-status
-  ([services]
-     (reverse (map (fn [[key config]]
-                     (assoc (-> config :worker service/get-status)
-                       :name (:name config)
-                       :id key))
-                   services)))
-  ([key services]
-     (if-let [config (services key)]
-       (assoc (-> config :worker service/get-status)
-         :name (:name config)
-         :id key))))
 
-(defn build [services]
+(defn- get-environment-status [group-key key environment]
+  (assoc (-> environment :worker service/get-status)
+    :name (:name environment)
+    :id key
+    :group-id group-key))
+
+(defn- get-group-status [key group]
+  (assoc group
+    :id key
+    :environments (reverse (map (fn [[env-key environment]]
+                                  (get-environment-status key env-key environment))
+                                (:environments group)))))
+
+(defn- get-groups-status [groups]
+  (reverse (map (fn [[key group]] (get-group-status key group)) groups)))
+
+
+(defn build [groups]
   (routes
-   (GET "/" [] (dashboard/generate "Dashboard"
-                (dashboard/services-overview (get-status services))))
-   (GET "/:id" [id]
-        (if-let [status (get-status id services)]
-          (dashboard/generate (:name status) (dashboard/service-detail status))
-          {:status 404 :body "Service not found"}))
-
    (route/resources "/static/")
+   
+   (GET "/" [] (dashboard/generate "Dashboard"
+                (dashboard/groups-overview (get-groups-status groups))))
+   (GET "/:group-id" [group-id]
+        (if-let [group (groups group-id)]
+          (dashboard/generate (:name group)
+                              (dashboard/environments-detail
+                               (:environments (get-group-status group-id group))))
+          {:status 404 :body "Group not found"}))
+
+   (GET "/:group-id/:id" [group-id id]
+        (if-let [group (groups group-id)]
+          (if-let [environment ((:environments group) id)]
+            (dashboard/generate (:name environment)
+                                (dashboard/environment-detail
+                                 (get-environment-status group-id id environment)))
+            {:status 404 :body "Environment not found"})
+          {:status 404 :body "Group not found"}))
+
    (route/not-found "Page not found")))
 

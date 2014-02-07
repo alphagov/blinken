@@ -34,62 +34,77 @@ header h1 {
     display: inline-block;
     margin: 0;
     font-weight: normal;
+    font-size: 32px;
 }
 
+h2 {
+    margin: 15px 0 10px 0;
+    padding: 0;
+    font-weight: normal;
+    font-size: 28px;
+}
 
-.service-overview {
+h2 a {
+    color: #000;
+    text-decoration: none;
+}
+
+h2 a:hover {
+    text-decoration: underline;
+}
+
+.environment-overview {
     display: inline-block;
     position: relative;
     margin-right: 20px;
     overflow: hidden;
     width: 320px;
-    height: 200px;
+    height: 160px;
     padding: 10px;
     color: #fff;
     text-decoration: none;
-    margin-top: 20px;
 }
 
-.service-overview:hover {
+.environment-overview:hover {
     text-decoration: underline;
 }
 
-.service-overview h2 {
+.environment-overview h3 {
     font-weight: normal;
     padding: 0;
     margin: 0;
     font-size: 28px;
 }
 
-.service-overview.critical {
+.environment-overview.critical {
     background-color: rgba(255, 0, 0, 0.8);
 }
 
-.service-overview.warning {
+.environment-overview.warning {
     background-color: #ffcc05;
 }
 
-.service-overview.ok {
+.environment-overview.ok {
     background-color: rgba(0, 128, 0, 0.8)
 }
 
-.service-overview.no-data {
+.environment-overview.no-data {
     background-color: #ccc;
 }
 
-.service-overview .count {
+.environment-overview .count {
     font-size: 80px;
     font-weight: bold;
     color: rgba(255, 255, 255, 1);
 }
 
-.service-overview .count .critical {
+.environment-overview .count .critical {
     position: absolute;
     bottom: 0;
     left: 10px;
 }
 
-.service-overview .count .warning {
+.environment-overview .count .warning {
     position: absolute;
     bottom: 0;
     right: 10px;

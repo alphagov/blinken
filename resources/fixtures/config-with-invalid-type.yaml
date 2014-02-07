@@ -1,9 +1,12 @@
 
-services:
-  "a":
-    type: icinga
-    url:  https://icinga.foo
-  "b":
-    type: not-a-type
-    url:  https://foo
+groups:
+  foo:
+    name: "Foo"
+    environments:
+      "a":
+         type: icinga
+         url:  https://icinga.foo
+      "b":
+         type: not-a-type
+         url:  https://foo
 

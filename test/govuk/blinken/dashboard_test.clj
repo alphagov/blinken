@@ -95,47 +95,47 @@
       (is (has-content? html "No data"))
       (is (not (has-class? html "problem-alerts"))))))
 
-(deftest test-service-overview
+(deftest test-environment-overview
   (testing "general layout"
-    (let [html (dashboard/service-overview {:name "Some Service!"
-                                            :alerts {:critical [1 2 3]
-                                                     :warning []}})]
-      (is (has-class? html "service-overview critical"))
+    (let [html (dashboard/environment-overview {:name "Some Environment!"
+                                                :alerts {:critical [1 2 3]
+                                                         :warning []}})]
+      (is (has-class? html "environment-overview critical"))
       (is (element-has-content? html "critical" 3))
       (is (element-has-content? html "warning" 0))
-      (is (has-content? html "Some Service!"))))
+      (is (has-content? html "Some Environment!"))))
 
   (testing "warning overview"
-    (let [html (dashboard/service-overview {:name "Some Service!"
-                                            :alerts {:critical []
-                                                     :warning [1 2 3]}})]
-      (is (has-class? html "service-overview warning"))
+    (let [html (dashboard/environment-overview {:name "Some Environment!"
+                                                :alerts {:critical []
+                                                         :warning [1 2 3]}})]
+      (is (has-class? html "environment-overview warning"))
       (is (not (has-class? html "critical")))
       (is (element-has-content? html "warning" 3))))
 
   (testing "ok overview"
-    (let [html (dashboard/service-overview {:name "Some Service!"
-                                            :alerts {:critical []
-                                                     :warning []}})]
-      (is (has-class? html "service-overview ok"))
+    (let [html (dashboard/environment-overview {:name "Some Environment!"
+                                                :alerts {:critical []
+                                                         :warning []}})]
+      (is (has-class? html "environment-overview ok"))
       (is (not (has-class? html "critical")))
       (is (not (has-class? html "warning")))))
 
   (testing "no data overview"
-    (let [html (dashboard/service-overview {:name "Some Service!"
-                                            :alerts nil})]
-      (is (has-class? html "service-overview no-data"))
+    (let [html (dashboard/environment-overview {:name "Some Environment!"
+                                                :alerts nil})]
+      (is (has-class? html "environment-overview no-data"))
       (is (not (has-class? html "count"))))))
 
 (deftest test-generate-structure
-  (testing "has correct number of services"
-    (let [services [{:name "GOV.UK Production" :hosts {:up [] :down []}}
-                    {:name "GOV.UK Staging" :hosts {:up [] :down []}}]
-          services-html (dashboard/services-detail services)
-          html (dashboard/generate-structure "List of services" services-html)]
+  (testing "has correct number of environments"
+    (let [environments [{:name "Production" :hosts {:up [] :down []}}
+                        {:name "Staging" :hosts {:up [] :down []}}]
+          environments-html (dashboard/environments-detail environments)
+          html (dashboard/generate-structure "List of environments" environments-html)]
       (is (has-content? html "Home"))
-      (is (has-content? html "List of services"))
-      (is (= (num-elements-with-class html "service") 2))
+      (is (has-content? html "List of environments"))
+      (is (= (num-elements-with-class html "environment") 2))
       (is (= (num-elements-with-class html "host-status") 2)))))
 
 

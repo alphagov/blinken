@@ -1,5 +1,8 @@
 
-services:
-  "a":
-    type: icinga
+groups:
+  foo:
+    name: "Foo"
+    environments:
+      "a":
+         type: icinga
     
