@@ -2,6 +2,7 @@
   (:require [org.httpkit.client :as http]
             [cheshire.core :as json]
             [clojure.core.async :as async]
+            [clojure.tools.logging :as log]
             [govuk.blinken.service :as service]))
 
 
@@ -25,14 +26,14 @@
 
 (defn- handle-response [status-atom status-keyword parse-fn response]
   (cond (:error response)
-        (println "Request error:" response)
+        (log/error "Request error:" response)
 
         (= (:status response) 200)
         (swap! status-atom assoc status-keyword
                (parse-fn (json/parse-string (:body response) true)))
 
         :else
-        (println "Unknown request error:" response)))
+        (log/error "Unknown request error:" response)))
 
 (defn to-query-params [& hashes]
   (let [all-params (reverse (apply merge hashes))]
@@ -54,7 +55,7 @@
   service/Service
   (start [this] (let [poll-ms (get user-options :poll-ms 1000)
                       http-options (get user-options :http {})]
-                  (println (str "Starting poller [ms:" poll-ms ", url:" url "]"))
+                  (log/info (str "Starting poller [ms:" poll-ms ", url:" url "]"))
                   (reset! poller-atom
                           (poll poll-ms
                                      (fn [status-atom]
@@ -67,7 +68,7 @@
   (stop [this] (if-let [poller @poller-atom]
                  (do (cancel-poll poller)
                      (reset! poller-atom nil)
-                     (println "Killed poller")))))
+                     (log/info "Killed poller")))))
 
 (defn create [url poller-options user-options]
   (let [status-atom (atom {:hosts  nil

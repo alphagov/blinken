@@ -2,6 +2,7 @@
   (:require [docopt.core :as dc]
             [docopt.match :as dm]
             [clojure.java.io :as io]
+            [clojure.tools.logging :as log]
             [govuk.blinken.service.icinga :as icinga]
             [govuk.blinken.service.sensu :as sensu]
             [clj-yaml.core :as yaml]
@@ -20,9 +21,9 @@
                 (assoc environments (name key) {:name (get config :name (name key))
                                                 :worker (worker-fn (:url config)
                                                                    (:options config))})
-                (do (println "Invalid type for environment " (name key))
+                (do (log/warn "Invalid type for environment " (name key))
                     environments))
-              (do (println "Please provide both a type and url for" (name key))
+              (do (log/warn "Please provide both a type and url for" (name key))
                   environments)))
           {} environments-config))
 
@@ -31,7 +32,7 @@
             (let [environments (create-environments (:environments config)
                                                     type-to-worker-fn)]
               (if (empty? environments)
-                (do (println "No environments for group" (name key))
+                (do (log/warn "No environments for group" (name key))
                   groups)
                 (assoc groups (name key) {:name (get config :name (name key))
                                           :environments environments}))))
@@ -80,5 +81,5 @@ Options:
                (service/start (:worker config)))
              (httpkit/run-server (routes/build (:groups config))
                                  {:port port})
-             (println "Started web server on" port))
-         (println "Config file does not exist:" config-path))))))
+             (log/info "Started web server on" port))
+         (log/error "Config file does not exist:" config-path))))))
