@@ -90,6 +90,7 @@
   [:html
    [:head
     [:title (str title " - Blinken")]
+    [:meta {:http-equiv "refresh" :content "10"}]
     (page/include-css "/static/main.css")]
    [:body
     [:header
