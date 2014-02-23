@@ -4,6 +4,8 @@ A dashboard to integrate multiple alert systems
 
 Blinken stands for Blinken lights increase network knowledge effectively now.
 
+![Screen Shot of Blinken in action](https://github.com/alphagov/blinken/raw/master/blinken_screen_shot.png)
+
 ## Attribution
 
 The eye logo was originally created by Dmitry Baranovskiy (http://thenounproject.com/term/eye/5001/)
