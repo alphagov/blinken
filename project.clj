@@ -13,4 +13,5 @@
                  [lein-daemon "0.5.4"]
                  [org.clojure/core.async "0.1.267.0-0d7780-alpha"]
                  [org.clojure/tools.logging "0.2.6"]]
+  :plugins [[lein-daemon "0.5.4"]]
   :main govuk.blinken)
