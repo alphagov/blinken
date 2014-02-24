@@ -23,8 +23,8 @@
     (map-indexed (fn [i alert]
                    [:tr {:class (str "alert " (if (= i max-i) status-class))}
                     [:td {:class (str "status " status-class)}]
-                    [:td {:class "name"} (:name alert)]
                     [:td {:class "host"} (:host alert)]
+                    [:td {:class "name"} (:name alert)]
                     [:td {:class "info"} (:info alert)]])
                  alerts)))
 
