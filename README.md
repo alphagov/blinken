@@ -5,6 +5,7 @@ A dashboard to integrate multiple alert systems
 Blinken stands for Blinken lights increase network knowledge effectively now.
 
 ![Screen Shot of Blinken in action](https://github.com/alphagov/blinken/raw/master/blinken_screen_shot.png)
+![Screen Shot of detailed view](https://github.com/alphagov/blinken/raw/master/blinken_detail_view.png)
 
 ## Usage
 
