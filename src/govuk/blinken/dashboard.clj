@@ -19,7 +19,7 @@
      [:h2 "Hosts"] [:div "No data"]]))
 
 (defn- list-alerts [alerts status-class]
-  (let [max-i (- (count alerts) 1)]
+  (let [max-i (dec (count alerts))]
     (map-indexed (fn [i alert]
                    [:tr {:class (str "alert " (if (= i max-i) status-class))}
                     [:td {:class (str "status " status-class)}]
