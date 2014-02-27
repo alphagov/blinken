@@ -11,7 +11,7 @@
        [:ul {:class "status-list"}
         [:li "Up: " [:span {:class "ok"} (count (:up status))]]
         [:li "Down: " [:span {:class "critical"} num-down]]]
-       (if (> num-down 0)
+       (if (pos? num-down)
          [:ul {:class "down-hosts"}
           (for [down-host (:down status)]
             [:li down-host])])])
@@ -19,7 +19,7 @@
      [:h2 "Hosts"] [:div "No data"]]))
 
 (defn- list-alerts [alerts status-class]
-  (let [max-i (- (count alerts) 1)]
+  (let [max-i (dec (count alerts))]
     (map-indexed (fn [i alert]
                    [:tr {:class (str "alert " (if (= i max-i) status-class))}
                     [:td {:class (str "status " status-class)}]
@@ -41,7 +41,7 @@
         [:li "Warning: " [:span {:class "warning"} num-warning]]
         [:li "Critical: " [:span {:class "critical"} num-critical]]
         [:li "Unknown: " [:span {:class "unknown"} num-unknown]]]
-       (if (> (+ num-warning num-critical num-unknown) 0)
+       (if (pos? (+ num-warning num-critical num-unknown))
          [:table {:class "problem-alerts"}
           [:thead [:tr [:td] [:td "Host"] [:td "Name"] [:td "Info"]]]
           (list-alerts (:critical alerts) "critical")
@@ -55,8 +55,8 @@
   (let [critical-count (-> environment :alerts :critical count)
         warning-count (-> environment :alerts :warning count)
         level (cond (-> environment :alerts not) :no-data
-                    (> critical-count 0) :critical
-                    (> warning-count 0) :warning
+                    (pos? critical-count) :critical
+                    (pos? warning-count) :warning
                     :else :ok)]
     [:a {:href (str "/" (:group-id environment) "/" (:id environment))
          :class (str "environment-overview " (name level))} 
