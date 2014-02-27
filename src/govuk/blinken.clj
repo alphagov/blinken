@@ -42,7 +42,7 @@
   (if-let [file (io/as-file path)]
     (if (.exists (io/as-file file))
       (let [raw (yaml/parse-string (slurp file))]
-        (assoc raw :groups (create-groups (:groups raw) type-to-worker-fn))))))
+        (update-in raw [:groups] create-groups type-to-worker-fn)))))
 
 
 (def usage "Blinken
