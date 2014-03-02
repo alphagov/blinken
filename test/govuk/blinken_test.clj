@@ -22,15 +22,14 @@
       (let [group-govuk (groups "govuk")]
         (is (= (:name group-govuk) "GOV.UK"))
         (let [prod ((:environments group-govuk) "prod")]
-          (is (= (:name prod) "Production"))
+          (is (= {:name "Production"
+                  :worker {:type "icinga"
+                           :url "https://icinga.foo.production"
+                           :options {:foo "bar"}}}
+                 prod))
           (is (nil? (:type prod)))
           (is (nil? (:url prod)))
-          (is (nil? (:options prod)))
-          (is (:worker prod))
-          (is (= (-> prod :worker :type) "icinga"))
-          (is (= (-> prod :worker :url) "https://icinga.foo.production"))
-          (is (= (-> prod :worker :options)
-                 {:foo "bar"}))))))
+          (is (nil? (:options prod)))))))
 
   (testing "config file doesn't exist"
     (is (nil? (blinken/load-config (io/resource "fixtures/laeurglaerugh")
