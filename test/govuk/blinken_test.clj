@@ -4,9 +4,11 @@
             [govuk.blinken :as blinken]))
 
 
-(def type-to-worker-fn {"icinga" (fn [url options] {:type "icinga"
-                                                   :url url
-                                                   :options options})})
+(def type-to-worker-fn
+  {"icinga" (fn [url options]
+              {:type "icinga"
+               :url url
+               :options options})})
 
 (deftest test-load-config
   (testing "with spec config"
