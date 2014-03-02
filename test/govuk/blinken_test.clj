@@ -17,11 +17,9 @@
           groups (:groups config)]
       (is (= (count groups) 2))
       (let [group-another (groups "another")]
-        (is group-another)
         (is (= (:name group-another) "another"))
         (is (= (count (:environments group-another)) 1)))
       (let [group-govuk (groups "govuk")]
-        (is group-govuk)
         (is (= (:name group-govuk) "GOV.UK"))
         (let [prod ((:environments group-govuk) "prod")]
           (is (= (:name prod) "Production"))
