@@ -8,7 +8,8 @@
             [clj-yaml.core :as yaml]
             [org.httpkit.server :as httpkit]
             [govuk.blinken.service :as service]
-            [govuk.blinken.routes :as routes]))
+            [govuk.blinken.routes :as routes])
+  (:gen-class :main true))
 
 
 (def type-to-worker-fn {"icinga" icinga/create
