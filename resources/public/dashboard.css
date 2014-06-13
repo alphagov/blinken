@@ -1,0 +1,124 @@
+
+.group-overview {
+    margin: 0;
+    margin-top: 30px;
+    padding: 0;
+    list-style: none;
+}
+
+.group-overview:first-of-type {
+    margin-top: 10px;
+}
+
+.environment-overview a {
+    display: block;
+    color: #fff;
+    height: 100%;
+}
+
+.environment-overview h3 {
+    display: inline-block;
+    font-weight: normal;
+    padding: 0;
+    margin: 0;
+    text-decoration: underline;
+}
+
+.environment-overview.critical {
+    background-color: rgba(255, 0, 0, 0.8);
+}
+
+.environment-overview.warning {
+    background-color: #ffcc05;
+}
+
+.environment-overview.ok {
+    background-color: rgba(0, 128, 0, 0.8);
+}
+
+.environment-overview.no-data {
+    background-color: #ccc;
+}
+
+.environment-overview .count .critical {
+    display: inline-block;
+    color: rgba(255, 255, 255, 1);
+}
+
+.environment-overview .count .warning {
+    display: inline-block;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+
+@media only screen and (max-width: 760px) {
+
+    .environment-overview {
+        display: block;
+        border-bottom: 1px solid #fff;
+        clear: both;
+    }
+
+    .environment-overview a {
+        padding: 15px 10px;
+    }   
+
+    .environment-overview h3 {
+        font-size: 22px;
+    }
+
+    .environment-overview .count {
+        display: inline-block;
+        font-size: 22px;
+        float: right;
+    }
+
+    .environment-overview .count > div {
+        text-align: right;
+        width: 35px;
+    }
+
+}
+
+@media only screen and (min-width: 760px) {
+
+    .environment-overview {
+        display: inline-block;
+        width: 29.3%;
+        margin-left: 3%;
+        height: 200px;
+        position: relative;
+    }
+    
+    .environment-overview:last {
+        margin-right: 3%;
+    }
+
+    .environment-overview a {
+        padding: 10px;
+    }
+
+    .environment-overview h3 {
+        font-size: 28px;
+    }
+
+    .environment-overview .count {
+        font-size: 80px;
+        font-weight: bold;
+    }
+
+    .environment-overview .count .critical {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+    }
+
+    .environment-overview .count .warning {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+    }
+
+}
+
+

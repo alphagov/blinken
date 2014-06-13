@@ -1,0 +1,140 @@
+
+.alerts h3,
+.host-status h3  { 
+    display: inline-block; 
+    font-size: 20px;
+    font-weight: normal;
+    margin: 20px 0 10px 10px;
+    padding: 0;
+}
+
+.host-status h3 {
+    margin-top: 0;
+}
+
+.status-list {
+    margin: 0;
+    padding: 0;
+}
+
+.status-list li { 
+    display: inline-block; 
+    width: 50%;
+    color: #fff;
+    text-align: center;
+    padding: 10px;
+}
+
+.host-status .status-list li {
+    width: 50%;
+}
+    
+.alerts .status-list li {
+    width: 25%;
+}
+    
+.status-list .critical { background-color: rgba(255, 0, 0, 0.8); }
+.status-list .warning { background-color: #ffcc05; }
+.status-list .unknown { background-color: #ccc; }
+.status-list .ok { background-color: rgba(0, 128, 0, 0.8); }
+
+.alerts { margin-bottom: 40px; }
+
+@media only screen and (max-width: 760px) {
+
+    .problem-alerts,
+    .problem-alerts thead,
+    .problem-alerts tbody,
+    .problem-alerts th,
+    .problem-alerts tr,
+    .problem-alerts td {
+        display: block;
+        font-size: 12px;
+    }
+    
+    .problem-alerts thead {
+        display: none;
+    }
+    
+    .problem-alerts tr {
+        padding-top: 10px;
+    }
+    
+    .problem-alerts td {
+        position: relative;
+        padding: 20px 0 10px 10px;
+    }
+    
+    .problem-alerts td:last-of-type {
+        border-bottom: 1px solid #eee;
+    }
+    
+    .problem-alerts td.status {
+        display: none;
+    }
+    
+    .problem-alerts td:before {
+        position: absolute;
+        left: 10px;
+        top: 0;
+        width: 70px;
+        font-weight: bold;
+    }
+    
+    .problem-alerts td:nth-of-type(2):before { content: "Host" }
+    .problem-alerts td:nth-of-type(3):before { content: "Name" }
+    .problem-alerts td:nth-of-type(4):before { content: "Info" }
+    
+    .problem-alerts td.info pre {
+        margin: 0;
+        padding: 10px 0;
+        width: 100%;
+        overflow-x: scroll;
+    }
+
+    .problem-alerts tr.critical { border-left: 10px solid rgba(255,0,0,0.8); }
+    .problem-alerts tr.warning { border-left: 10px solid #ffcc05; }
+    .problem-alerts tr.unknown { border-left: 10px solid #ccc; }
+
+}
+
+@media only screen and (min-width: 760px) {
+
+    .problem-alerts {
+        border-spacing: 0;
+        font-size: 14px;
+        margin: 10px 0;
+        width: 100%;
+        table-layout: fixed;
+    }
+
+    .problem-alerts thead {
+        font-size: 18px;
+        font-weight: bold;
+    }
+
+    .problem-alerts td { 
+        padding: 5px;
+        vertical-align: top;
+    }
+
+    .problem-alerts td.host { width:200px; }
+    .problem-alerts td.name { width:300px; }
+    .problem-alerts td.status { width: 10px; }
+
+    .problem-alerts pre {
+        margin: 0;
+        width: 100%;
+        overflow-x: scroll;
+    }
+
+    .problem-alerts tr.critical td { border-bottom: 1px solid rgba(255,0,0,0.8); }
+    .problem-alerts tr.warning td { border-bottom: 1px solid #ffcc05; }
+    .problem-alerts tr.unknown td { border-bottom: 1px solid #ccc; }
+    .problem-alerts .status.critical { background-color: rgba(255,0,0,0.8); }
+    .problem-alerts .status.warning { background-color: #ffcc05; }
+    .problem-alerts .status.unknown { background-color: #ccc; }
+
+}
+
+

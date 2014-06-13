@@ -9,8 +9,8 @@
       [:div {:class "host-status"}
        [:h3 "Hosts"]
        [:ul {:class "status-list"}
-        [:li "Up: " [:span {:class "ok"} (count (:up status))]]
-        [:li "Down: " [:span {:class "critical"} num-down]]]
+        [:li {:class "ok"} (count (:up status))]
+        [:li {:class "critical"} num-down]]
        (if (pos? num-down)
          [:ul {:class "down-hosts"}
           (for [down-host (:down status)]
@@ -21,11 +21,11 @@
 (defn- list-alerts [alerts status-class]
   (let [max-i (dec (count alerts))]
     (map-indexed (fn [i alert]
-                   [:tr {:class (str "alert " (if (= i max-i) status-class))}
+                   [:tr {:class (str "alert " status-class)}
                     [:td {:class (str "status " status-class)}]
                     [:td {:class "host"} (:host alert)]
                     [:td {:class "name"} (:name alert)]
-                    [:td {:class "info"} (:info alert)]])
+                    [:td {:class "info"} [:pre (:info alert)]]])
                  alerts)))
 
 (defn alerts [alerts]  
@@ -37,13 +37,13 @@
       [:div {:class "alerts"}
        [:h3 "Alerts"]
        [:ul {:class "status-list"}
-        [:li "Ok: " [:span {:class "ok"} num-ok]]
-        [:li "Warning: " [:span {:class "warning"} num-warning]]
-        [:li "Critical: " [:span {:class "critical"} num-critical]]
-        [:li "Unknown: " [:span {:class "unknown"} num-unknown]]]
+        [:li {:class "ok"} num-ok]
+        [:li {:class "warning"} num-warning]
+        [:li {:class "critical"} num-critical]
+        [:li {:class "unknown"} num-unknown]]
        (if (pos? (+ num-warning num-critical num-unknown))
          [:table {:class "problem-alerts"}
-          [:thead [:tr [:td] [:td "Host"] [:td "Name"] [:td "Info"]]]
+          [:thead [:tr [:td {:class "status"}] [:td {:class "host"} "Host"] [:td {:class "name"} "Name"] [:td {:class "info"} "Info"]]]
           (list-alerts (:critical alerts) "critical")
           (list-alerts (:warning alerts) "warning")
           (list-alerts (:unknown alerts) "unknown")])])
@@ -58,17 +58,17 @@
                     (pos? critical-count) :critical
                     (pos? warning-count) :warning
                     :else :ok)]
-    [:a {:href (str "/" (:group-id environment) "/" (:id environment))
-         :class (str "environment-overview " (name level))} 
-     [:h3 (:name environment)]
-     (if (not (or (= level :ok) (= level :no-data)))
-       [:div {:class "count"}
-        (if (= level :critical) [:div {:class "critical"} critical-count])
-        [:div {:class "warning"} warning-count]])]))
+    [:li {:class (str "environment-overview " (name level))}
+     [:a {:href (str "/" (:group-id environment) "/" (:id environment))} 
+      [:h3 (:name environment)]
+      (if (not (or (= level :ok) (= level :no-data)))
+        [:div {:class "count"}
+         (if (= level :critical) [:div {:class "critical"} critical-count])
+         [:div {:class "warning"} warning-count]])]]))
 
 (defn group-overview [group]
-  [:div {:class "group-overview"}
-   [:h2 [:a {:href (str "/" (:id group))} (:name group)]]
+  [:ul {:class "group-overview"}
+   [:li {:class "header"} [:h2 [:a {:href (str "/" (:id group))} (:name group)]]]
    (for [environment (:environments group)]
      (environment-overview environment))])
 
@@ -77,27 +77,28 @@
 
 (defn environment-detail [environment]
   [:div {:class "environment"}
+   [:h2 (:name environment)]
    (host-status (:hosts environment))
    (alerts (:alerts environment))])
 
 (defn environments-detail [environments]
   (for [environment environments]
     [:div {:class "environment-container"}
-     [:h2 (:name environment)]
      (environment-detail environment)]))
 
-(defn generate-structure [title & body]
+(defn generate-structure [home-link? & body]
   [:html
    [:head
-    [:title (str title " - Blinken")]
-    [:meta {:http-equiv "refresh" :content "10"}]
-    (page/include-css "/static/main.css")]
+    [:title  "Blinken"]
+    [:meta {:name "viewport" :content "width=device-width"}]
+    (comment [:meta {:http-equiv "refresh" :content "10"}])
+    (page/include-css "/static/main.css")
+    (page/include-css "/static/dashboard.css")
+    (page/include-css "/static/detail.css")]
    [:body
-    [:header
-     [:a {:href "/"} "Home"]
-     [:h1 title]]
+    (if home-link? [:header [:a {:href "/"} "<< Return to dashboard"]])
     body]])
 
-(defn generate [title & body]
-  (page/html5 (generate-structure title body)))
+(defn generate [home-link? & body]
+  (page/html5 (generate-structure home-link? body)))
 
