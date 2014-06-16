@@ -132,9 +132,7 @@
     (let [environments [{:name "Production" :hosts {:up [] :down []}}
                         {:name "Staging" :hosts {:up [] :down []}}]
           environments-html (dashboard/environments-detail environments)
-          html (dashboard/generate-structure "List of environments" environments-html)]
-      (is (has-content? html "Home"))
-      (is (has-content? html "List of environments"))
+          html (dashboard/generate-structure true environments-html)]
       (is (= (num-elements-with-class html "environment") 2))
       (is (= (num-elements-with-class html "host-status") 2)))))
 

@@ -26,20 +26,18 @@
   (routes
    (route/resources "/static/")
    
-   (GET "/" [] (dashboard/generate "Dashboard"
+   (GET "/" [] (dashboard/generate false
                 (dashboard/groups-overview (get-groups-status groups))))
    (GET "/:group-id" [group-id]
         (if-let [group (groups group-id)]
-          (dashboard/generate (:name group)
-                              (dashboard/environments-detail
+          (dashboard/generate true (dashboard/environments-detail
                                (:environments (get-group-status group-id group))))
           {:status 404 :body "Group not found"}))
 
    (GET "/:group-id/:id" [group-id id]
         (if-let [group (groups group-id)]
           (if-let [environment ((:environments group) id)]
-            (dashboard/generate (:name environment)
-                                (dashboard/environment-detail
+            (dashboard/generate true (dashboard/environment-detail
                                  (get-environment-status group-id id environment)))
             {:status 404 :body "Environment not found"})
           {:status 404 :body "Group not found"}))
