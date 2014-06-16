@@ -91,7 +91,7 @@
    [:head
     [:title  "Blinken"]
     [:meta {:name "viewport" :content "width=device-width"}]
-    (comment [:meta {:http-equiv "refresh" :content "10"}])
+    [:meta {:http-equiv "refresh" :content "10"}]
     (page/include-css "/static/main.css")
     (page/include-css "/static/dashboard.css")
     (page/include-css "/static/detail.css")]
