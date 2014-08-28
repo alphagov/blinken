@@ -19,17 +19,24 @@
                                         :name (:check alert)
                                         :info (:output alert)}))))
 
-(defn parse-alerts [alerts-json]
+
+(defn matches-filter-param? [filter-params alert key]
+  (re-matches (re-pattern (filter-params key)) (alert key)))
+
+(defn matches-filter-params? [filter-params alert]
+  (every? (partial matches-filter-param? filter-params alert) (keys filter-params)))
+
+(defn filter-alerts [filter-params alerts]
+  (filter #(matches-filter-params? filter-params %) alerts))
+
+(defn parse-alerts [filter-params, alerts-json]
   (reduce parse-alert
           {:critical [] :warning [] :ok [] :unknown []}
-          alerts-json))
-
-
+          (filter-alerts filter-params alerts-json)))
 
 (defn create [url options]
-  (polling/create url {:alerts {:resource "/events"
-                                :parse-fn parse-alerts}
-                       :hosts {:resource "/clients"
-                               :parse-fn parse-hosts}} options))
-
-
+  (let [filter-params (-> options :alerts :filter-params)]
+    (polling/create url {:alerts {:resource "/events"
+                                  :parse-fn (partial parse-alerts filter-params)}
+                         :hosts {:resource "/clients"
+                                 :parse-fn parse-hosts}} options)))
