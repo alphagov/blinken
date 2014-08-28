@@ -19,13 +19,23 @@
 
 (deftest test-parse-alerts
   (testing "converts alerts to simple map"
-    (is (= (sensu/parse-alerts example-alerts-json)
+    (is (= (sensu/parse-alerts {} example-alerts-json)
            {:critical [{:host "backend-app-1.localdomain"
                         :name "backdrop_buckets_health_check"
                         :info "CheckHTTP CRITICAL: 500\n"}
                        {:host "backend-app-2.localdomain"
                         :name "backdrop_buckets_health_check"
                         :info "CheckHTTP CRITICAL: 500\n"}]
+            :warning  [{:host "monitoring-1.localdomain"
+                        :name "check_low_disk_space_monitoring-1"
+                        :info "CheckGraphiteData WARNING: check_low_disk_space_monitoring-1 has passed warning threshold (2830925824.0)\n"}]
+            :ok       []
+            :unknown  []}))))
+
+(deftest test-filter-alerts
+  (testing "filters relevant alerts"
+    (is (= (sensu/parse-alerts {:client ".*monitoring.*"} example-alerts-json)
+           {:critical []
             :warning  [{:host "monitoring-1.localdomain"
                         :name "check_low_disk_space_monitoring-1"
                         :info "CheckGraphiteData WARNING: check_low_disk_space_monitoring-1 has passed warning threshold (2830925824.0)\n"}]

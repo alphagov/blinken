@@ -21,6 +21,9 @@ groups:
           # You can provide query-parameters for use when requesting
           # alerts or hosts, which with icinga can be useful for limiting
           # what you receive. Docs: http://docs.icinga.org/latest/en/cgiparams.html
+          # You can provide filter-params to use for filtering sensu alerts after getting them.
+          # The value of this is unlike icinga, sensu does not allow us to filter what events
+          # want. So we need to filter them after we get them.
           alerts:
             query-params:
               # Host Status Types: All
@@ -36,6 +39,9 @@ groups:
               #                     And Notifications Enabled
               #                     And In Hard State
               serviceprops: 270346
+            filter-params:
+              #Only get events which match the regex pattern specified for client
+              client: .*integration.*
 
           # You can provide options to be passed through to the underlying
           # http client (http://http-kit.org/client.html#options)
