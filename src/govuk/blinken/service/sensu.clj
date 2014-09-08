@@ -34,9 +34,14 @@
           {:critical [] :warning [] :ok [] :unknown []}
           (filter-alerts filter-params alerts-json)))
 
+(defn parse-all [{:keys [alerts hosts]}]
+  {:alerts (parse-alerts {} alerts)
+   :hosts  (parse-hosts hosts)})
+
 (defn create [url options]
   (let [filter-params (-> options :alerts :filter-params)]
-    (polling/create url {:alerts {:resource "/events"
-                                  :parse-fn (partial parse-alerts filter-params)}
-                         :hosts {:resource "/clients"
-                                 :parse-fn parse-hosts}} options)))
+    (polling/create url
+                    {:resources {:alerts "/events"
+                                 :hosts  "/clients"}
+                     :parse-fn parse-all}
+                    options)))

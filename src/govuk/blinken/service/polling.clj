@@ -24,7 +24,7 @@
 
 
 
-(defn- handle-response [status-atom status-keyword parse-fn response]
+#_(defn- handle-response [status-atom status-keyword parse-fn response]
   (cond (:error response)
         (log/error "Request error:" response)
 
@@ -43,16 +43,22 @@
                                               (http/url-encode val)))
                                        all-params)))))
 
-(defn- get-and-parse [base-url endpoint options status-atom status-key]
-  (let [query-params (to-query-params (:query-params endpoint)
-                                      {"cachebuster" (System/currentTimeMillis)})
-        url (str base-url (:resource endpoint) query-params)]
-    (http/get url options (partial handle-response status-atom
-                                   status-key (:parse-fn endpoint)))))
 
 (defn get-all-and-parse [url http-options poller-options status-atom]
-  (doseq [[k v] poller-options]
-    (get-and-parse url v http-options status-atom k)))
+  (let [chs (for [[key path] (:resources poller-options)]
+              (do
+                (let [ch         (async/chan)
+                      query-params (to-query-params {} ;(:query-params endpoint)
+                                                    {"cachebuster" (System/currentTimeMillis)})
+                      url (str url path query-params)]
+                  (http/get url http-options #(async/put! ch %))
+                  [key ch])))]
+    (async/go-loop [chs chs results {}]
+      (if (seq chs)
+        (let [[[key ch] & rest] chs]
+          (recur rest (assoc results key (json/parse-string (:body (async/<! ch)) true))))
+        (let [parsed-results ((:parse-fn poller-options) results)]
+          (reset! status-atom parsed-results))))))
 
 (deftype PollingService [url poller-options user-options status-atom poller-atom]
   service/Service
