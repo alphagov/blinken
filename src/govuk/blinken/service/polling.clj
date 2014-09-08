@@ -50,6 +50,9 @@
     (http/get url options (partial handle-response status-atom
                                    status-key (:parse-fn endpoint)))))
 
+(defn get-all-and-parse [url http-options poller-options status-atom]
+  (doseq [[k v] poller-options]
+    (get-and-parse url v http-options status-atom k)))
 
 (deftype PollingService [url poller-options user-options status-atom poller-atom]
   service/Service
@@ -58,10 +61,8 @@
                   (log/info (str "Starting poller [ms:" poll-ms ", url:" url "]"))
                   (reset! poller-atom
                           (poll poll-ms
-                                     (fn [status-atom]
-                                       (doseq [[k v] poller-options]
-                                         (get-and-parse url v http-options status-atom k)))
-                                     status-atom))))
+                                (partial get-all-and-parse url http-options poller-options)
+                                status-atom))))
   (get-status [this] @status-atom)
   (stop [this] (if-let [poller @poller-atom]
                  (do (cancel-poll poller)
