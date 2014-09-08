@@ -59,10 +59,8 @@
                   (reset! poller-atom
                           (poll poll-ms
                                      (fn [status-atom]
-                                       (get-and-parse url (:alerts poller-options)
-                                                      http-options status-atom :alerts)
-                                       (get-and-parse url (:hosts poller-options)
-                                                      http-options status-atom :hosts))
+                                       (doseq [[k v] poller-options]
+                                         (get-and-parse url v http-options status-atom k)))
                                      status-atom))))
   (get-status [this] @status-atom)
   (stop [this] (if-let [poller @poller-atom]
