@@ -69,6 +69,5 @@
                      (log/info "Killed poller")))))
 
 (defn create [url poller-options user-options]
-  (let [status-atom (atom {:hosts  nil
-                           :alerts nil})]
+  (let [status-atom (atom {})]
     (PollingService. url poller-options user-options status-atom (atom nil))))
