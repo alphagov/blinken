@@ -10,12 +10,12 @@
 (defn poll [ms func & args]
   (let [control (async/chan)
         times (atom 0)
-        out (async/go (loop [[v ch] (async/alts! [(async/timeout 0) control])]
-                        (if (= ch control)
-                          @times
-                          (do (swap! times inc)
-                              (apply func args)
-                              (recur (async/alts! [(async/timeout ms) control]))))))]
+        out (async/go-loop [[v ch] (async/alts! [(async/timeout 0) control])]
+              (if (= ch control)
+                @times
+                (do (swap! times inc)
+                    (apply func args)
+                    (recur (async/alts! [(async/timeout ms) control])))))]
     {:control control :out out}))
 
 (defn cancel-poll [chans]
@@ -74,6 +74,3 @@
   (let [status-atom (atom {:hosts  nil
                            :alerts nil})]
     (PollingService. url poller-options user-options status-atom (atom nil))))
-
-
-
