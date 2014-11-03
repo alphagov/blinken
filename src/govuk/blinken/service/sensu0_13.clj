@@ -20,22 +20,17 @@
                                         :info (:output (:check alert))}))))
 
 
-(defn match-function [function? filter-params alert]
-  (every? (partial function? filter-params alert) (keys filter-params)))
-
-
-(defn matches-filter-param? [filter-params alert key]
-  (if (map? (filter-params key))
-    (match-function matches-filter-param? (filter-params key) (alert key))
-    (re-matches (re-pattern (filter-params key)) (str(alert key)))))
-
-
-(defn matches-filter-params? [filter-params alert]
- (match-function matches-filter-param? filter-params alert))
-
-
 (defn filter-alerts [filter-params alerts]
-  (filter #(matches-filter-params? filter-params %) alerts))
+  (letfn [(matches-filter-param? [filter-params alert key]
+            (let [filter-param (filter-params key)
+                  alert        (alert key)]
+              (if (map? filter-param)
+                (matches-filter-params? filter-param alert)
+                (re-matches (re-pattern filter-param) (str alert)))))
+          (matches-filter-params? [filter-params alert]
+            (every? (partial matches-filter-param? filter-params alert) (keys filter-params)))]
+
+    (filter #(matches-filter-params? filter-params %) alerts)))
 
 
 (defn parse-alerts [filter-params, alerts-json]

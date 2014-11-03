@@ -1,4 +1,4 @@
-(ns govuk.blinken.service.sensu0_13-test
+(ns govuk.blinken.service.sensu0-13-test
   (:require [clojure.test :refer :all]
             [clojure.java.io :as io]
             [cheshire.core :as json]
