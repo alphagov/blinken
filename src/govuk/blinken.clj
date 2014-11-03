@@ -5,6 +5,7 @@
             [clojure.tools.logging :as log]
             [govuk.blinken.service.icinga :as icinga]
             [govuk.blinken.service.sensu :as sensu]
+            [govuk.blinken.service.sensu0_13 :as sensu0_13]
             [clj-yaml.core :as yaml]
             [org.httpkit.server :as httpkit]
             [govuk.blinken.service :as service]
@@ -13,7 +14,8 @@
 
 
 (def type-to-worker-fn {"icinga" icinga/create
-                        "sensu" sensu/create})
+                        "sensu" sensu/create
+                        "sensu0_13" sensu0_13/create})
 
 (defn- create-environments [environments-config type-to-worker-fn]
   (reduce (fn [environments [key config]]
