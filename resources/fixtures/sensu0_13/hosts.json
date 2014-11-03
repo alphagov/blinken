@@ -1,0 +1,4 @@
+[
+{"address":"10.0.0.1","subscriptions":[],"safe_mode":true,"bind":"127.0.0.1","name":"dns-2.prod","version":"0.16.0","timestamp":1414970594},
+{"subscriptions":[],"safe_mode":true,"bind":"127.0.0.1","name":"monitoring-1.prod","address":"10.0.0.2","version":"0.16.0","timestamp":1414970596}
+]
