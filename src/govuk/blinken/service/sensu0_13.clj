@@ -1,4 +1,4 @@
-(ns govuk.blinken.service.sensu0_13
+(ns govuk.blinken.service.sensu0-13
   (:require [govuk.blinken.service.polling :as polling]))
 
 
