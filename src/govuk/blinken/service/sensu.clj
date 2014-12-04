@@ -12,22 +12,26 @@
 (def status-to-type {0 :ok 1 :warning 2 :critical 3 :unknown})
 
 (defn- parse-alert [alerts alert]
-  (let [status-keyword (status-to-type (:status alert))
+  (let [status-keyword (status-to-type (:status (:check alert)))
         current-list (alerts status-keyword)]
     (assoc alerts status-keyword (conj current-list
-                                       {:host (:client alert)
-                                        :name (:check alert)
-                                        :info (:output alert)}))))
+                                       {:host (:name (:client alert))
+                                        :name (:name (:check alert))
+                                        :info (:output (:check alert))}))))
 
-
-(defn matches-filter-param? [filter-params alert key]
-  (re-matches (re-pattern (filter-params key)) (alert key)))
-
-(defn matches-filter-params? [filter-params alert]
-  (every? (partial matches-filter-param? filter-params alert) (keys filter-params)))
 
 (defn filter-alerts [filter-params alerts]
-  (filter #(matches-filter-params? filter-params %) alerts))
+  (letfn [(matches-filter-param? [filter-params alert key]
+            (let [filter-param (filter-params key)
+                  alert        (alert key)]
+              (if (map? filter-param)
+                (matches-filter-params? filter-param alert)
+                (re-matches (re-pattern filter-param) (str alert)))))
+          (matches-filter-params? [filter-params alert]
+            (every? (partial matches-filter-param? filter-params alert) (keys filter-params)))]
+
+    (filter #(matches-filter-params? filter-params %) alerts)))
+
 
 (defn parse-alerts [filter-params, alerts-json]
   (reduce parse-alert
