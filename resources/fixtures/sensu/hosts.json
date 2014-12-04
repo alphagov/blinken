@@ -1,4 +1,4 @@
 [
-{"name":"logs-elasticsearch-1.localdomain","address":"172.27.1.51","subscriptions":[],"safe_mode":true,"timestamp":1391427733},
-{"name":"backend-app-2.localdomain","address":"172.27.1.22","subscriptions":[],"safe_mode":true,"timestamp":1391427734}
+{"address":"10.0.0.1","subscriptions":[],"safe_mode":true,"bind":"127.0.0.1","name":"dns-2.prod","version":"0.16.0","timestamp":1414970594},
+{"subscriptions":[],"safe_mode":true,"bind":"127.0.0.1","name":"monitoring-1.prod","address":"10.0.0.2","version":"0.16.0","timestamp":1414970596}
 ]
