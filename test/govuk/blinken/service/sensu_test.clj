@@ -14,31 +14,59 @@
 (deftest test-parse-hosts
   (testing "converts hosts to simple map"
     (is (= (sensu/parse-hosts example-hosts-json)
-           {:up ["logs-elasticsearch-1.localdomain" "backend-app-2.localdomain"]
+           {:up ["dns-2.prod" "monitoring-1.prod"]
             :down []}))))
 
 (deftest test-parse-alerts
   (testing "converts alerts to simple map"
     (is (= (sensu/parse-alerts {} example-alerts-json)
-           {:critical [{:host "backend-app-1.localdomain"
-                        :name "backdrop_buckets_health_check"
-                        :info "CheckHTTP CRITICAL: 500\n"}
-                       {:host "backend-app-2.localdomain"
-                        :name "backdrop_buckets_health_check"
-                        :info "CheckHTTP CRITICAL: 500\n"}]
-            :warning  [{:host "monitoring-1.localdomain"
-                        :name "check_low_disk_space_monitoring-1"
-                        :info "CheckGraphiteData WARNING: check_low_disk_space_monitoring-1 has passed warning threshold (2830925824.0)\n"}]
+           {:critical [{:host "proxy-1.prod"
+                        :name "proxy-1_vhost_check"
+                        :info "CheckHTTP CRITICAL: Connection error: Connection refused - connect(2)\n"}
+                       {:host "proxy-1.prod"
+                        :name "proxy-1_application_errors"
+                        :info "CheckLog CRITICAL: 0 warnings, 2 criticals for pattern \"level\":\"ERROR\"\n"}]
+            :warning  [{:host "proxy-1.prod"
+                        :name "nginx_service_check"
+                        :info "CheckCMDStatus CRITICAL: /etc/init.d/nginx status exited with 3\n"}
+                       {:host "proxy-2.prod"
+                        :name "proxy_application_errors"
+                        :info "CheckLog CRITICAL: 0 warnings, 1 criticals for pattern \"level\":\"ERROR\"\n"}]
             :ok       []
             :unknown  []}))))
 
 (deftest test-filter-alerts
   (testing "filters relevant alerts"
-    (is (= (sensu/parse-alerts {:client ".*monitoring.*"} example-alerts-json)
+    (is (= (sensu/parse-alerts {:client {:name "proxy-2.*" :bind "127.0.0.1"}} example-alerts-json)
            {:critical []
-            :warning  [{:host "monitoring-1.localdomain"
-                        :name "check_low_disk_space_monitoring-1"
-                        :info "CheckGraphiteData WARNING: check_low_disk_space_monitoring-1 has passed warning threshold (2830925824.0)\n"}]
+            :warning  [{:host "proxy-2.prod"
+                        :name "proxy_application_errors"
+                        :info "CheckLog CRITICAL: 0 warnings, 1 criticals for pattern \"level\":\"ERROR\"\n"}]
+            :ok       []
+            :unknown  []}))))
+
+(deftest test-filter-alerts2
+  (testing "filters relevant alerts (multiple hashes)"
+    (is (= (sensu/parse-alerts {:client {:address "10.0.0.1"} :check {:output ".*CRITICAL.*\n"}} example-alerts-json)
+           {:critical [{:host "proxy-1.prod"
+                        :name "proxy-1_vhost_check"
+                        :info "CheckHTTP CRITICAL: Connection error: Connection refused - connect(2)\n"}
+                       {:host "proxy-1.prod"
+                        :name "proxy-1_application_errors"
+                        :info "CheckLog CRITICAL: 0 warnings, 2 criticals for pattern \"level\":\"ERROR\"\n"}]
+            :warning  [{:host "proxy-1.prod"
+                        :name "nginx_service_check"
+                        :info "CheckCMDStatus CRITICAL: /etc/init.d/nginx status exited with 3\n"}]
+            :ok       []
+            :unknown  []}))))
+
+(deftest test-filter-alerts3
+  (testing "filters relevant alerts (match numbers)"
+    (is (= (sensu/parse-alerts {:id "a-b-c-d-e" :client {:address "10.0.0.1"} :check {:issued "1414.*"}} example-alerts-json)
+           {:critical [{:host "proxy-1.prod"
+                        :name "proxy-1_vhost_check"
+                        :info "CheckHTTP CRITICAL: Connection error: Connection refused - connect(2)\n"}]
+            :warning  []
             :ok       []
             :unknown  []}))))
 
