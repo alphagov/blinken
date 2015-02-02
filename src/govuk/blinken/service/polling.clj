@@ -5,8 +5,6 @@
             [clojure.tools.logging :as log]
             [govuk.blinken.service :as service]))
 
-
-
 (defn poll [ms func & args]
   (let [control (async/chan)
         times (atom 0)
@@ -22,18 +20,12 @@
   (async/>!! (:control chans) :cancel)
   (async/<!! (:out chans)))
 
+(defn handle-response [status-atom status-keyword parse-fn response]
+  (cond (:error response)          (log/error "Request error:" response)
+        (= (:status response) 200) (swap! status-atom assoc status-keyword
+                                          (parse-fn (json/parse-string (:body response) true)))
 
-
-(defn- handle-response [status-atom status-keyword parse-fn response]
-  (cond (:error response)
-        (log/error "Request error:" response)
-
-        (= (:status response) 200)
-        (swap! status-atom assoc status-keyword
-               (parse-fn (json/parse-string (:body response) true)))
-
-        :else
-        (log/error "Unknown request error:" response)))
+        :else (log/error "Unknown request error:" response)))
 
 (defn to-query-params [& hashes]
   (let [all-params (reverse (apply merge hashes))]
@@ -49,7 +41,6 @@
         url (str base-url (:resource endpoint) query-params)]
     (http/get url options (partial handle-response status-atom
                                    status-key (:parse-fn endpoint)))))
-
 
 (deftype PollingService [url poller-options user-options status-atom poller-atom]
   service/Service
