@@ -6,6 +6,7 @@
   :dependencies [[org.clojure/clojure "1.5.1"]
                  [docopt "0.6.1"]
                  [http-kit "2.1.16"]
+                 [http-kit.fake "0.2.1"]
                  [cheshire "5.2.0"]
                  [hiccup "1.0.4"]
                  [clj-yaml "0.4.0"]
