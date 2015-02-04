@@ -27,9 +27,9 @@
 
         :else (log/error "Unknown request error:" response)))
 
-(defn to-query-params [& hashes]
+(defn to-query-params [path & hashes]
   (let [all-params (reverse (apply merge hashes))]
-    (str "?" (clojure.string/join "&"
+    (str path "?" (clojure.string/join "&"
                                   (map (fn [[key val]]
                                          (str (http/url-encode (name key)) "="
                                               (http/url-encode val)))
