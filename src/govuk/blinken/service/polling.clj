@@ -21,12 +21,10 @@
   (async/>!! (:control chans) :cancel)
   (async/<!! (:out chans)))
 
-(defn- handle-response [status-atom status-keyword parse-fn response]
+(defn handle-response [status-atom status-keyword parse-fn response]
   (cond (:error response)
-        (do
-          (log/error "Request error:" status-atom)
-          (swap! status-atom assoc status-keyword
-                 {:error (:error response)}))
+        (do (log/error "Request error:" response)
+            (swap! status-atom assoc status-keyword nil))
 
         (= (:status response) 200)
           (do
@@ -34,7 +32,8 @@
                    (parse-fn (json/parse-string (:body response) true))))
 
         :else
-        (log/error "Unknown request error:" response)))
+        (do (log/error "Unknown request error:" response)
+            (swap! status-atom assoc status-keyword nil))))
 
 (defn to-query-params [& hashes]
   (let [all-params (reverse (apply merge hashes))]
