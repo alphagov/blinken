@@ -25,16 +25,18 @@
 
 
 
-(defn- handle-response [status-atom status-keyword parse-fn response]
+(defn handle-response [status-atom status-keyword parse-fn response]
   (cond (:error response)
-        (log/error "Request error:" response)
+        (do (log/error "Request error:" response)
+            (swap! status-atom assoc status-keyword nil))
 
         (= (:status response) 200)
         (swap! status-atom assoc status-keyword
                (parse-fn (json/parse-string (:body response) true)))
 
         :else
-        (log/error "Unknown request error:" response)))
+        (do (log/error "Unknown request error:" response)
+            (swap! status-atom assoc status-keyword nil))))
 
 (defn to-query-params [& hashes]
   (let [all-params (reverse (apply merge hashes))]
