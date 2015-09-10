@@ -4,11 +4,7 @@
             [govuk.blinken :as blinken]))
 
 (defn load-config [config-file]
-  (blinken/load-config (io/resource config-file)
-                       {"icinga" (fn [url options]
-                                   {:type "icinga"
-                                    :url url
-                                    :options options})}))
+  (blinken/load-config (io/resource config-file)))
 
 (deftest test-load-config
   (testing "config file doesn't exist"
@@ -24,13 +20,10 @@
         (is (= (:name group-govuk) "GOV.UK"))
         (let [prod ((:environments group-govuk) "prod")]
           (is (= {:name "Production"
-                  :worker {:type "icinga"
-                           :url "https://icinga.foo.production"
-                           :options {:foo "bar"}}}
-                 prod))
-          (is (nil? (:type prod)))
-          (is (nil? (:url prod)))
-          (is (nil? (:options prod)))))))
+                  :type "icinga"
+                  :url "https://icinga.foo.production"
+                  :options {:foo "bar"}}
+                 prod))))))
   (testing "invalid type"
     (let [config (load-config "fixtures/config-with-invalid-type.yaml")]
       (is (= (count (:environments ((:groups config) "foo"))) 1))))
