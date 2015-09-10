@@ -1,5 +1,6 @@
 (ns govuk.blinken.service.polling
-  (:require [org.httpkit.client :as http]
+  (:require [com.stuartsierra.component :as component]
+            [org.httpkit.client :as http]
             [cheshire.core :as json]
             [clojure.core.async :as async]
             [clojure.tools.logging :as log]
@@ -50,26 +51,37 @@
     (http/get url options (partial handle-response status-atom
                                    status-key (:parse-fn endpoint)))))
 
-(deftype PollingService [url poller-options user-options status-atom poller-atom]
+(defn- request-status [url poller-options http-options]
+  (fn [status-atom]
+    (get-and-parse url (:alerts poller-options)
+                   http-options status-atom :alerts)
+    (get-and-parse url (:hosts poller-options)
+                   http-options status-atom :hosts)))
+
+
+(defrecord PollingService [url poller-options user-options status-atom poller]
+  component/Lifecycle
+  (start [polling-service]
+    (if poller
+      polling-service
+      (let [poll-ms (get user-options :poll-ms 1000)
+            http-options (get user-options :http {})
+            new-poller (poll poll-ms (request-status url poller-options http-options) status-atom)]
+        (log/infof "Starting poller [ms: %d, url: %s]" poll-ms url)
+        (assoc polling-service :poller new-poller))))
+
+  (stop [polling-service]
+    (if poller
+      (do (cancel-poll poller)
+          (log/infof "Killed poller [url: %s]" url)
+          (assoc polling-service :poller nil))))
   service/Service
-  (start [this] (let [poll-ms (get user-options :poll-ms 1000)
-                      http-options (get user-options :http {})]
-                  (log/info (str "Starting poller [ms:" poll-ms ", url:" url "]"))
-                  (reset! poller-atom
-                          (poll poll-ms
-                                     (fn [status-atom]
-                                       (get-and-parse url (:alerts poller-options)
-                                                      http-options status-atom :alerts)
-                                       (get-and-parse url (:hosts poller-options)
-                                                      http-options status-atom :hosts))
-                                     status-atom))))
-  (get-status [this] @status-atom)
-  (stop [this] (if-let [poller @poller-atom]
-                 (do (cancel-poll poller)
-                     (reset! poller-atom nil)
-                     (log/info "Killed poller")))))
+  (get-status [this] @status-atom))
 
 (defn create [url poller-options user-options]
-  (let [status-atom (atom {:hosts  nil
-                           :alerts nil})]
-    (PollingService. url poller-options user-options status-atom (atom nil))))
+  (map->PollingService {:url url
+                        :poller-options poller-options
+                        :user-options user-options
+                        :status-atom (atom {:hosts  nil
+                                            :alerts nil})
+                        :poller nil}))
