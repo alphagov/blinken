@@ -25,18 +25,26 @@
 
 
 
-(defn handle-response [status-atom status-keyword parse-fn response]
+(defn- store! [status-atom timestamp key val]
+  (swap! status-atom (fn [status]
+                       (let [timestamp-for-keys (get status :timestamp {})
+                             last-timestamp (get timestamp-for-keys key 0)]
+                         (if (> timestamp last-timestamp)
+                           (assoc status key val :timestamp (assoc timestamp-for-keys key timestamp))
+                           status)))))
+
+(defn handle-response [status-atom timestamp key parse-fn response]
   (cond (:error response)
         (do (log/error "Request error:" response)
-            (swap! status-atom assoc status-keyword nil))
+            (store! status-atom timestamp key nil))
 
         (= (:status response) 200)
-        (swap! status-atom assoc status-keyword
-               (parse-fn (json/parse-string (:body response) true)))
+        (store! status-atom timestamp key
+                (parse-fn (json/parse-string (:body response) true)))
 
         :else
         (do (log/error "Unknown request error:" response)
-            (swap! status-atom assoc status-keyword nil))))
+            (store! status-atom timestamp key nil))))
 
 (defn to-query-params [& hashes]
   (let [all-params (reverse (apply merge hashes))]
@@ -47,11 +55,12 @@
                                        all-params)))))
 
 (defn- get-and-parse [base-url endpoint options status-atom status-key]
-  (let [query-params (to-query-params (:query-params endpoint)
+  (let [timestamp (System/currentTimeMillis)
+        query-params (to-query-params (:query-params endpoint)
                                       {"cachebuster" (System/currentTimeMillis)})
         url (str base-url (:resource endpoint) query-params)]
     (http/get url options (partial handle-response status-atom
-                                   status-key (:parse-fn endpoint)))))
+                                   timestamp status-key (:parse-fn endpoint)))))
 
 (defn- request-status [url poller-options http-options]
   (fn [status-atom]
