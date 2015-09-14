@@ -73,9 +73,9 @@
      [:a {:href (str "/" (:group-id environment) "/" (:id environment))}
       [:h3 (:name environment) [:small {:class "timestamp"} (format-timestamp (-> environment :timestamp :alerts))]]
       (if (not (or (= level :ok) (= level :no-data)))
-        [:table
-         (if (= level :critical) [:tr [:td {:class "label"} "Criticals"] [:td {:class "number critical"} critical-count]])
-         [:tr [:td {:class "label"} "Warnings"] [:td {:class "number"} warning-count]]])]]))
+        [:ul {:class "alerts-count"}
+         [:li (when (= level :critical) (list critical-count [:small "Criticals"]))]
+         [:li warning-count [:small "Warnings"]]])]]))
 
 (defn group-overview [group]
   [:ul {:class "group-overview"}
