@@ -1,4 +1,6 @@
 (ns govuk.blinken.dashboard
+  (:import [java.util Date]
+           [java.text SimpleDateFormat])
   (:require [hiccup.core :as hiccup]
             [hiccup.page :as page]))
 
@@ -50,6 +52,13 @@
      [:h2 "Alerts"]
      [:div "No data"]]))
 
+(defn- format-timestamp [timestamp]
+  (if timestamp
+     (let [date (Date. timestamp)
+           formatter (SimpleDateFormat. "yyyy-MM-dd HH:mm:ss")]
+       (.format formatter date))
+     "-"))
+
 (defn environment-overview [environment]
   (let [critical-count (-> environment :alerts :critical count)
         warning-count (-> environment :alerts :warning count)
@@ -59,14 +68,14 @@
                     (pos? critical-count) :critical
                     (pos? warning-count) :warning
                     :else :ok)]
-      [:li {:class (str "environment-overview " (name level))}
-       [:h2 error]
-       [:a {:href (str "/" (:group-id environment) "/" (:id environment))}
-        [:h3 (:name environment)]
-        (if (not (or (= level :ok) (= level :no-data)))
-          [:div {:class "count"}
-           (if (= level :critical) [:div {:class "critical"} critical-count])
-           [:div {:class "warning"} warning-count]])]]))
+    [:li {:class (str "environment-overview " (name level))}
+     [:h2 error]
+     [:a {:href (str "/" (:group-id environment) "/" (:id environment))}
+      [:h3 (:name environment) [:small {:class "timestamp"} (format-timestamp (-> environment :timestamp :alerts))]]
+      (if (not (or (= level :ok) (= level :no-data)))
+        [:table
+         (if (= level :critical) [:tr [:td {:class "label"} "Criticals"] [:td {:class "number critical"} critical-count]])
+         [:tr [:td {:class "label"} "Warnings"] [:td {:class "number"} warning-count]]])]]))
 
 (defn group-overview [group]
   [:ul {:class "group-overview"}
