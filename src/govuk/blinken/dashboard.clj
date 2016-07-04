@@ -2,7 +2,6 @@
   (:require [hiccup.core :as hiccup]
             [hiccup.page :as page]))
 
-
 (defn host-status [status]
   (if status
     (let [num-down (count (:down status))]
@@ -28,7 +27,7 @@
                     [:td {:class "info"} [:pre (:info alert)]]])
                  alerts)))
 
-(defn alerts [alerts]  
+(defn alerts [alerts]
   (if alerts
     (let [num-ok (count (:ok alerts))
           num-warning (count (:warning alerts))
@@ -101,4 +100,3 @@
 
 (defn generate [home-link? & body]
   (page/html5 (generate-structure home-link? body)))
-

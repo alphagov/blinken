@@ -5,8 +5,6 @@
             [clojure.tools.logging :as log]
             [govuk.blinken.service :as service]))
 
-
-
 (defn poll [ms func & args]
   (let [control (async/chan)
         times (atom 0)
@@ -50,7 +48,6 @@
     (http/get url options (partial handle-response status-atom
                                    status-key (:parse-fn endpoint)))))
 
-
 (deftype PollingService [url poller-options user-options status-atom poller-atom]
   service/Service
   (start [this] (let [poll-ms (get user-options :poll-ms 1000)
@@ -74,6 +71,3 @@
   (let [status-atom (atom {:hosts  nil
                            :alerts nil})]
     (PollingService. url poller-options user-options status-atom (atom nil))))
-
-
-

@@ -34,5 +34,3 @@
       (is (= (service/get-status i-service)
              {:hosts nil
               :alerts nil})))))
-
-

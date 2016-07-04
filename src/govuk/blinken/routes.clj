@@ -4,7 +4,6 @@
             [govuk.blinken.dashboard :as dashboard]
             [govuk.blinken.service :as service]))
 
-
 (defn- get-environment-status [group-key key environment]
   (assoc (-> environment :worker service/get-status)
     :name (:name environment)
@@ -21,11 +20,10 @@
 (defn- get-groups-status [groups]
   (reverse (map (fn [[key group]] (get-group-status key group)) groups)))
 
-
 (defn build [groups]
   (routes
    (route/resources "/static/")
-   
+
    (GET "/" [] (dashboard/generate false
                 (dashboard/groups-overview (get-groups-status groups))))
    (GET "/:group-id" [group-id]
@@ -43,4 +41,3 @@
           {:status 404 :body "Group not found"}))
 
    (route/not-found "Page not found")))
-

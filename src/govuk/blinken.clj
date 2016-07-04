@@ -68,7 +68,7 @@ Options:
          (arg-map "--help")
          (arg-map "-h"))
      (println usage)
-         
+
      (or (arg-map "--version")
          (arg-map "-v"))
      (println version)
