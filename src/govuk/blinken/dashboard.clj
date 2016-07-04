@@ -53,17 +53,20 @@
 (defn environment-overview [environment]
   (let [critical-count (-> environment :alerts :critical count)
         warning-count (-> environment :alerts :warning count)
+        error (-> environment :alerts :error)
         level (cond (-> environment :alerts not) :no-data
+                    (-> environment :alerts :error) :no-data
                     (pos? critical-count) :critical
                     (pos? warning-count) :warning
                     :else :ok)]
-    [:li {:class (str "environment-overview " (name level))}
-     [:a {:href (str "/" (:group-id environment) "/" (:id environment))} 
-      [:h3 (:name environment)]
-      (if (not (or (= level :ok) (= level :no-data)))
-        [:div {:class "count"}
-         (if (= level :critical) [:div {:class "critical"} critical-count])
-         [:div {:class "warning"} warning-count]])]]))
+      [:li {:class (str "environment-overview " (name level))}
+       [:h2 error]
+       [:a {:href (str "/" (:group-id environment) "/" (:id environment))}
+        [:h3 (:name environment)]
+        (if (not (or (= level :ok) (= level :no-data)))
+          [:div {:class "count"}
+           (if (= level :critical) [:div {:class "critical"} critical-count])
+           [:div {:class "warning"} warning-count]])]]))
 
 (defn group-overview [group]
   [:ul {:class "group-overview"}
@@ -75,10 +78,14 @@
   (map group-overview groups))
 
 (defn environment-detail [environment]
-  [:div {:class "environment"}
-   [:h2 (:name environment)]
-   (host-status (:hosts environment))
-   (alerts (:alerts environment))])
+  (let [error (-> environment :alerts :error)]
+    [:div {:class "environment"}
+     [:h2 (:name environment)]
+     (if error
+       [:h2 error]
+       (do
+         (host-status (:hosts environment))
+         (alerts (:alerts environment))))]))
 
 (defn environments-detail [environments]
   (for [environment environments]
