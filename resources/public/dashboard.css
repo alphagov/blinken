@@ -14,6 +14,7 @@
     display: block;
     color: #fff;
     height: 100%;
+    text-decoration: none;
 }
 
 .environment-overview h3 {
@@ -21,7 +22,6 @@
     font-weight: normal;
     padding: 0;
     margin: 0;
-    text-decoration: underline;
 }
 
 .environment-overview.critical {
@@ -38,6 +38,30 @@
 
 .environment-overview.no-data {
     background-color: #ccc;
+}
+
+.environment-overview .timestamp {
+    display: block;
+    font-size: 16px;
+    text-decoration: none;
+}
+
+.environment-overview table {
+    margin-top: 10px;
+    width: 100%;
+    border-spacing: 0;
+}
+
+.environment-overview table .label {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.environment-overview table .number {
+    text-align: right;
+}
+
+.environment-overview table .critical {
+    font-weight: bold;
 }
 
 .environment-overview .count .critical {
@@ -64,6 +88,10 @@
     }   
 
     .environment-overview h3 {
+        font-size: 22px;
+    }
+
+    .environment-overview table {
         font-size: 22px;
     }
 
@@ -95,11 +123,18 @@
     }
 
     .environment-overview a {
+        display: flex;
         padding: 10px;
+        flex-direction: column;
     }
 
     .environment-overview h3 {
         font-size: 28px;
+        flex-grow: 1;
+    }
+
+    .environment-overview table {
+        font-size: 38px;
     }
 
     .environment-overview .count {
@@ -117,6 +152,34 @@
         position: absolute;
         bottom: 10px;
         right: 10px;
+    }
+
+    .environment-overview .alerts-count {
+        display: flex;
+        flex-direction: row;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .environment-overview .alerts-count li {
+        flex-grow: 1;
+        line-height: 1;
+        font-size: 72px;
+    }
+
+    .environment-overview .alerts-count li:nth-child(odd) {
+        font-weight: bold;
+    }
+
+    .environment-overview .alerts-count li:nth-child(even) {
+        text-align: right;
+    }
+
+    .environment-overview .alerts-count small {
+        display: block;
+        font-size: 16px;
+        font-weight: normal;
     }
 
 }
