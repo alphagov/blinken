@@ -1,6 +1,7 @@
 (ns govuk.blinken
   (:require [docopt.core :as dc]
             [docopt.match :as dm]
+            [com.stuartsierra.component :as component]
             [clojure.java.io :as io]
             [clojure.tools.logging :as log]
             [govuk.blinken.service.icinga :as icinga]
@@ -8,30 +9,28 @@
             [clj-yaml.core :as yaml]
             [org.httpkit.server :as httpkit]
             [govuk.blinken.service :as service]
-            [govuk.blinken.routes :as routes])
-  (:gen-class :main true))
+            [govuk.blinken.system :refer [new-system]]
+            [govuk.blinken.routes :as routes]))
 
+(def valid-types #{"icinga" "sensu"})
 
-(def type-to-worker-fn {"icinga" icinga/create
-                        "sensu" sensu/create})
-
-(defn- create-environments [environments-config type-to-worker-fn]
+(defn- create-environments [environments-config]
   (reduce (fn [environments [key config]]
             (if (and (:type config) (:url config))
-              (if-let [worker-fn (type-to-worker-fn (:type config))]
+              (if (valid-types (:type config))
                 (assoc environments (name key) {:name (get config :name (name key))
-                                                :worker (worker-fn (:url config)
-                                                                   (:options config))})
+                                                :type (:type config)
+                                                :url (:url config)
+                                                :options (:options config)})
                 (do (log/warn "Invalid type for environment " (name key))
                     environments))
               (do (log/warn "Please provide both a type and url for" (name key))
                   environments)))
           {} environments-config))
 
-(defn- create-groups [groups-config type-to-worker-fn]
+(defn- create-groups [groups-config]
   (reduce (fn [groups [key config]]
-            (let [environments (create-environments (:environments config)
-                                                    type-to-worker-fn)]
+            (let [environments (create-environments (:environments config))]
               (if (empty? environments)
                 (do (log/warn "No environments for group" (name key))
                   groups)
@@ -39,11 +38,11 @@
                                           :environments environments}))))
           {} groups-config))
 
-(defn load-config [path type-to-worker-fn]
+(defn load-config [path]
   (if-let [file (io/as-file path)]
     (if (.exists (io/as-file file))
       (let [raw (yaml/parse-string (slurp file))]
-        (update-in raw [:groups] create-groups type-to-worker-fn)))))
+        (update-in raw [:groups] create-groups)))))
 
 
 (def usage "Blinken
@@ -68,7 +67,7 @@ Options:
          (arg-map "--help")
          (arg-map "-h"))
      (println usage)
-         
+
      (or (arg-map "--version")
          (arg-map "-v"))
      (println version)
@@ -76,11 +75,7 @@ Options:
      :else
      (let [config-path (arg-map "<config-path>")
            port (Integer/parseInt (arg-map "--port"))]
-       (if-let [config (load-config config-path type-to-worker-fn)]
-         (do (doseq [[_ group] (:groups config)
-                     [key config] (-> group :environments vec)]
-               (service/start (:worker config)))
-             (httpkit/run-server (routes/build (:groups config))
-                                 {:port port})
-             (log/info "Started web server on" port))
+       (if-let [config (load-config config-path)]
+         (let [system (new-system port config)]
+           (component/start system))
          (log/error "Config file does not exist:" config-path))))))

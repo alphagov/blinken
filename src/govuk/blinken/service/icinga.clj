@@ -1,8 +1,6 @@
 (ns govuk.blinken.service.icinga
   (:require [govuk.blinken.service.polling :as polling]))
 
-
-
 (defn- parse-host [hosts host]
   (let [status (:status host)
         status-keyword (if (= status "UP") :up :down)
@@ -13,8 +11,6 @@
   (reduce parse-host
           {:up [] :down []}
           (-> hosts-json :status :host_status)))
-
-
 
 (defn- parse-alert [alerts alert]
   (let [status (:status alert)
@@ -33,14 +29,12 @@
           {:critical [] :warning [] :ok [] :unknown []}
           (-> alerts-json :status :service_status)))
 
-
 (defn deep-merge
   "Recursively merges maps. If keys are not maps, the last value wins."
   [& vals]
   (if (every? map? vals)
     (apply merge-with deep-merge vals)
     (last vals)))
-
 
 (defn create [url options]
   (polling/create url {:alerts (deep-merge {:resource "/cgi-bin/icinga/status.cgi"
@@ -53,6 +47,3 @@
                                                           "jsonoutput" 1}
                                            :parse-fn parse-hosts}
                                           (get options :hosts {}))} options))
-
-
-

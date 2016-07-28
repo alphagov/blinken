@@ -1,7 +1,8 @@
 (ns govuk.blinken.dashboard
+  (:import [java.util Date]
+           [java.text SimpleDateFormat])
   (:require [hiccup.core :as hiccup]
             [hiccup.page :as page]))
-
 
 (defn host-status [status]
   (if status
@@ -28,7 +29,7 @@
                     [:td {:class "info"} [:pre (:info alert)]]])
                  alerts)))
 
-(defn alerts [alerts]  
+(defn alerts [alerts]
   (if alerts
     (let [num-ok (count (:ok alerts))
           num-warning (count (:warning alerts))
@@ -51,20 +52,30 @@
      [:h2 "Alerts"]
      [:div "No data"]]))
 
+(defn- format-timestamp [timestamp]
+  (if timestamp
+     (let [date (Date. timestamp)
+           formatter (SimpleDateFormat. "yyyy-MM-dd HH:mm:ss")]
+       (.format formatter date))
+     "-"))
+
 (defn environment-overview [environment]
   (let [critical-count (-> environment :alerts :critical count)
         warning-count (-> environment :alerts :warning count)
+        error (-> environment :alerts :error)
         level (cond (-> environment :alerts not) :no-data
+                    (-> environment :alerts :error) :no-data
                     (pos? critical-count) :critical
                     (pos? warning-count) :warning
                     :else :ok)]
     [:li {:class (str "environment-overview " (name level))}
-     [:a {:href (str "/" (:group-id environment) "/" (:id environment))} 
-      [:h3 (:name environment)]
+     [:h2 error]
+     [:a {:href (str "/" (:group-id environment) "/" (:id environment))}
+      [:h3 (:name environment) [:small {:class "timestamp"} (format-timestamp (-> environment :timestamp :alerts))]]
       (if (not (or (= level :ok) (= level :no-data)))
-        [:div {:class "count"}
-         (if (= level :critical) [:div {:class "critical"} critical-count])
-         [:div {:class "warning"} warning-count]])]]))
+        [:ul {:class "alerts-count"}
+         [:li (when (= level :critical) (list critical-count [:small "Criticals"]))]
+         [:li warning-count [:small "Warnings"]]])]]))
 
 (defn group-overview [group]
   [:ul {:class "group-overview"}
@@ -76,10 +87,14 @@
   (map group-overview groups))
 
 (defn environment-detail [environment]
-  [:div {:class "environment"}
-   [:h2 (:name environment)]
-   (host-status (:hosts environment))
-   (alerts (:alerts environment))])
+  (let [error (-> environment :alerts :error)]
+    [:div {:class "environment"}
+     [:h2 (:name environment)]
+     (if error
+       [:h2 error]
+       (do
+         (host-status (:hosts environment))
+         (alerts (:alerts environment))))]))
 
 (defn environments-detail [environments]
   (for [environment environments]
@@ -101,4 +116,3 @@
 
 (defn generate [home-link? & body]
   (page/html5 (generate-structure home-link? body)))
-

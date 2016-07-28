@@ -10,7 +10,7 @@ Blinken stands for Blinken lights increase network knowledge effectively now.
 
 ## Usage
 
-Can be run as a daemon `lein daemon start blinken /path/to/config.yaml`
+`lein run /path/to/config.yaml`
 
 ## License
 
