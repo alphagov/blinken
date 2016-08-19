@@ -34,7 +34,6 @@
   (let [flat-html (flatten html)]
     (count (filter #(= (:class %) class) flat-html))))
 
-
 (deftest test-host-status
   (testing "host status widget with just up"
     (let [html (dashboard/host-status {:up ["foo" "bar"] :down []})]
@@ -101,8 +100,9 @@
                                                 :alerts {:critical [1 2 3]
                                                          :warning []}})]
       (is (has-class? html "environment-overview critical"))
-      (is (element-has-content? html "critical" 3))
-      (is (element-has-content? html "warning" 0))
+      (is (has-content? html "Criticals"))
+      (is (= "[:li (3 [:small \"Criticals\"])]" (str (get-in html [3 3 2]))))
+      (is (has-content? html "Warnings"))
       (is (has-content? html "Some Environment!"))))
 
   (testing "warning overview"
@@ -111,29 +111,18 @@
                                                          :warning [1 2 3]}})]
       (is (has-class? html "environment-overview warning"))
       (is (not (has-class? html "critical")))
-      (is (element-has-content? html "warning" 3))))
+      (is (has-content? html "Warnings"))))
 
   (testing "ok overview"
     (let [html (dashboard/environment-overview {:name "Some Environment!"
                                                 :alerts {:critical []
                                                          :warning []}})]
       (is (has-class? html "environment-overview ok"))
-      (is (not (has-class? html "critical")))
-      (is (not (has-class? html "warning")))))
+      (is (not (has-class? html "Criticals")))
+      (is (not (has-class? html "Warnings")))))
 
   (testing "no data overview"
     (let [html (dashboard/environment-overview {:name "Some Environment!"
                                                 :alerts nil})]
       (is (has-class? html "environment-overview no-data"))
       (is (not (has-class? html "count"))))))
-
-(deftest test-generate-structure
-  (testing "has correct number of environments"
-    (let [environments [{:name "Production" :hosts {:up [] :down []}}
-                        {:name "Staging" :hosts {:up [] :down []}}]
-          environments-html (dashboard/environments-detail environments)
-          html (dashboard/generate-structure true environments-html)]
-      (is (= (num-elements-with-class html "environment") 2))
-      (is (= (num-elements-with-class html "host-status") 2)))))
-
-
